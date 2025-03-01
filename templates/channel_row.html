@@ -1,0 +1,34 @@
+<li class="list-group-item d-flex justify-content-between align-items-center" id="channel-{{ channel.id }}">
+    <div>
+      {% if channel.logo %}
+        <img src="{{ channel.logo }}" alt="{{ channel.name }}" style="height: 30px; margin-right: 10px;">
+      {% endif %}
+      <a href="{{ url_for('play_channel', channel_id=channel.id) }}"
+         hx-get="{{ url_for('play_channel', channel_id=channel.id) }}"
+         hx-target="#video-player"
+         hx-swap="innerHTML">
+         {{ channel.name }}
+      </a>
+      {% if channel.category %}
+        <span class="badge bg-secondary">{{ channel.category }}</span>
+      {% endif %}
+    </div>
+    <div>
+      {% if channel.state != 'active' %}
+        <button class="btn btn-sm btn-success" 
+                hx-post="{{ url_for('activate_channel', channel_id=channel.id) }}"
+                hx-target="#channel-{{ channel.id }}"
+                hx-swap="outerHTML">Activate</button>
+      {% else %}
+        <button class="btn btn-sm btn-warning" 
+                hx-post="{{ url_for('deactivate_channel', channel_id=channel.id) }}"
+                hx-target="#channel-{{ channel.id }}"
+                hx-swap="outerHTML">Deactivate</button>
+      {% endif %}
+      <button class="btn btn-sm btn-danger" 
+              hx-delete="{{ url_for('delete_channel', channel_id=channel.id) }}"
+              hx-target="#channel-{{ channel.id }}"
+              hx-swap="outerHTML">Delete</button>
+    </div>
+  </li>
+  

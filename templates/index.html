@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <!-- Sidebar: Channel List, Feed Sync Form, Scan Option, and Feed List -->
+  <div class="col-md-4">
+    <h3>Channels ({{ filter_state.capitalize() }})</h3>
+    <ul class="list-group" id="channel-list">
+      {% for channel in channels %}
+        {% include "channel_row.html" %}
+      {% else %}
+        <li class="list-group-item">No channels found.</li>
+      {% endfor %}
+    </ul>
+    
+    <div class="mt-3">
+      <h5>Sync Feeds</h5>
+      <form method="post" action="{{ url_for('sync') }}">
+        <div class="mb-3">
+          <textarea class="form-control" name="playlist_urls" placeholder="Enter one or more playlist URLs (one per line)" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Sync Now</button>
+      </form>
+    </div>
+
+    <div class="mt-3">
+      <h5>Current Feeds</h5>
+      <ul class="list-group">
+        {% for feed in feeds %}
+          <li class="list-group-item">{{ feed.url }}</li>
+        {% else %}
+          <li class="list-group-item">No feeds added.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    
+    <div class="mt-3">
+      <h5>Scan Channels</h5>
+      <form method="post" action="{{ url_for('scan') }}">
+        <button type="submit" class="btn btn-secondary">Scan Active Channels</button>
+      </form>
+    </div>
+    
+    <div class="mt-3">
+      <h5>Filter Channels</h5>
+      <div class="btn-group" role="group">
+        <a href="{{ url_for('index', state='active') }}" class="btn btn-outline-primary {% if filter_state=='active' %}active{% endif %}">Active</a>
+        <a href="{{ url_for('index', state='inactive') }}" class="btn btn-outline-primary {% if filter_state=='inactive' %}active{% endif %}">Inactive</a>
+        <a href="{{ url_for('index', state='discontinued') }}" class="btn btn-outline-primary {% if filter_state=='discontinued' %}active{% endif %}">Discontinued</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content: Video Player -->
+  <div class="col-md-8" id="player-container">
+    <h3>Player</h3>
+    <div id="video-player">
+      <p>Select a channel to start playing.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
