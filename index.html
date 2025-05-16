@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HLS / IPTV Stream Explorer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- hls.js -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100 text-gray-900">
+    <main class="container mx-auto p-6 max-w-6xl">
+        <!-- Header -->
+        <header>
+            <h1 class="text-3xl font-bold mb-2">Stream Explorer & Player</h1>
+            <p class="text-gray-600">
+                Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
+                streams and play them on click (HLS supported via <code>hls.js</code>).
+            </p>
+        </header>
+
+        <!-- Controls -->
+        <div class="flex flex-col sm:flex-row gap-2 mt-4">
+            <input id="manifestUrl" type="url" placeholder="https://example.com/playlist.m3u8"
+                class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
+            <button id="loadBtn" class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
+                Load
+            </button>
+        </div>
+
+        <!-- Two‑column layout -->
+        <div class="flex flex-col lg:flex-row gap-4 mt-6">
+            <!-- Sidebar: search + list -->
+            <aside
+                class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm h-[70vh] overflow-hidden bg-white">
+                <!-- Search -->
+                <div id="searchWrap" class="hidden p-2 border-b border-gray-200">
+                    <input id="searchInput" type="text" placeholder="Filter channels..."
+                        class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
+                </div>
+
+                <!-- Streams list -->
+                <ul id="streamList" class="flex-1 overflow-y-auto space-y-1 text-blue-700 p-2 pr-3"></ul>
+            </aside>
+
+            <!-- Player -->
+            <section class="flex-1">
+                <video id="videoPlayer" class="w-full h-[70vh] rounded shadow-lg bg-black" controls
+                    preload="metadata"></video>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        let hls = null;
+        let activeLi = null;
+        const loadBtn = document.getElementById("loadBtn");
+        const manifestInput = document.getElementById("manifestUrl");
+        const streamList = document.getElementById("streamList");
+        const searchWrap = document.getElementById("searchWrap");
+        const searchInput = document.getElementById("searchInput");
+        const video = document.getElementById("videoPlayer");
+
+        loadBtn.addEventListener("click", fetchAndRender);
+
+        searchInput.addEventListener("input", () => {
+            const term = searchInput.value.trim().toLowerCase();
+            [...streamList.children].forEach((li) => {
+                li.classList.toggle("hidden", !li.dataset.label?.toLowerCase().includes(term));
+            });
+        });
+
+        // Show placeholder on first load
+        showPlaceholder();
+
+        async function fetchAndRender() {
+            const url = manifestInput.value.trim();
+            if (!url) return alert("Enter a playlist URL.");
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const text = await res.text();
+                const items = parsePlaylist(url, text);
+                renderList(items);
+                searchWrap.classList.toggle("hidden", items.length < 8);
+            } catch (err) {
+                console.error(err);
+                alert(`Failed: ${err.message}. Server must allow CORS.`);
+            }
+        }
+
+        /** Parse .m3u or .m3u8 for IPTV (#EXTINF) or HLS master (#EXT-X-STREAM-INF). */
+        function parsePlaylist(baseUrl, text) {
+            const lines = text.split(/\r?\n/).map((l) => l.trim());
+            const streams = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+
+                // IPTV channel list (#EXTINF)
+                if (line.startsWith("#EXTINF")) {
+                    const attrsStr = line.substring(8).split(",")[0];
+                    const name = line.split(",").slice(1).join(",").trim() || "Channel";
+                    const attrs = Object.fromEntries(
+                        attrsStr
+                            .split(/\s(?=\w+=)/) // space before key=
+                            .map((kv) => kv.split("=").map((v) => v.replace(/^"|"$/g, "")))
+                    );
+                    const uri = resolveUrl(baseUrl, lines[i + 1]);
+                    streams.push({
+                        uri,
+                        label: attrs["tvg-name"] || attrs["tvg-id"] || name,
+                        group: attrs["group-title"] || "",
+                    });
+                    i++; // consume URI
+                    continue;
+                }
+
+                // HLS master playlist variant (#EXT-X-STREAM-INF)
+                if (line.startsWith("#EXT-X-STREAM-INF")) {
+                    const attrs = Object.fromEntries(
+                        line
+                            .replace("#EXT-X-STREAM-INF:", "")
+                            .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
+                            .map((kv) => kv.split("=").map((v) => v.replace(/^"|"$/g, "")))
+                    );
+                    const uri = resolveUrl(baseUrl, lines[i + 1]);
+                    streams.push({
+                        uri,
+                        label: `${attrs.RESOLUTION || "Auto"} • ${attrs.BANDWIDTH ? attrs.BANDWIDTH / 1000 + " kbps" : ""}`.trim(),
+                        group: "Variants",
+                    });
+                    i++;
+                }
+            }
+
+            return streams;
+        }
+
+        function renderList(items) {
+            streamList.innerHTML = "";
+            activeLi = null;
+
+            if (!items.length) {
+                showPlaceholder();
+                return;
+            }
+
+            items.forEach((item, idx) => {
+                const li = document.createElement("li");
+                li.dataset.label = item.label;
+                li.className = "cursor-pointer hover:underline flex items-center";
+                li.innerHTML = `
+            <span>${item.label || `Stream ${idx + 1}`}</span>
+            <span class="playIcon ml-1 hidden" aria-label="playing">▶️</span>
+            <span class="errorIcon ml-1 hidden text-red-500" aria-label="error">🚫</span>
+          `;
+                li.title = item.group;
+                li.addEventListener("click", () => play(item.uri, li));
+                streamList.appendChild(li);
+            });
+        }
+
+        function showPlaceholder() {
+            streamList.innerHTML = '<li class="text-gray-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</li>';
+        }
+
+        function play(url, li) {
+            // Reset icons on previous active entry
+            if (activeLi) {
+                activeLi.querySelector(".playIcon").classList.add("hidden");
+                activeLi.querySelector(".errorIcon").classList.add("hidden");
+            }
+
+            // --- CLEAN UP PREVIOUS PLAYBACK ---
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+            // Pause & reset the video element to abort any ongoing network activity
+            video.pause();
+            video.removeAttribute("src");
+            video.load();
+            video.onerror = null; // clear previous handler
+
+            const isHls = /\.m3u8($|\?)/i.test(url);
+
+            if (isHls && Hls.isSupported()) {
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) setErrorIcon(li);
+                });
+            } else {
+                video.src = url;
+            }
+
+            // Error handler for native element
+            video.onerror = () => setErrorIcon(li);
+
+            video.play().catch(() => setErrorIcon(li));
+
+            setPlayIcon(li);
+            activeLi = li;
+        }
+
+        function setPlayIcon(li) {
+            li.querySelector(".errorIcon").classList.add("hidden");
+            li.querySelector(".playIcon").classList.remove("hidden");
+        }
+
+        function setErrorIcon(li) {
+            li.querySelector(".playIcon").classList.add("hidden");
+            li.querySelector(".errorIcon").classList.remove("hidden");
+        }
+
+        function resolveUrl(base, path) {
+            try {
+                return new URL(path, base).href;
+            } catch {
+                return path;
+            }
+        }
+    </script>
+</body>
+
+</html>
