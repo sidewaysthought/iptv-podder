@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h3>Settings</h3>
+    
+    <!-- Sync Feeds and Scan Controls -->
+    <div class="mb-4">
+      <h5>Sync Feeds</h5>
+      <form method="post" action="{{ url_for('sync') }}">
+        <div class="mb-3">
+          <textarea class="form-control" name="playlist_urls" placeholder="Enter one or more playlist URLs (one per line)" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Sync Now</button>
+      </form>
+    </div>
+    
+    <div class="mb-4">
+      <h5>Scan Channels</h5>
+      <form method="post" action="{{ url_for('scan') }}">
+        <button type="submit" class="btn btn-secondary">Scan Active Channels</button>
+      </form>
+    </div>
+    
+    <!-- Bulk Operations Controls (Top of Table) -->
+    <form method="post">
+      <div class="d-flex align-items-center mb-2">
+        <div class="me-3">
+          <label for="new_state" class="form-label mb-0">Change status to:</label>
+          <select class="form-select" id="new_state" name="new_state" style="width:150px;">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="discontinued">Discontinued</option>
+          </select>
+        </div>
+        <div class="me-3">
+          <button type="submit" formaction="{{ url_for('bulk_update') }}" class="btn btn-sm btn-info">Bulk Update</button>
+        </div>
+        <div>
+          <button type="submit" formaction="{{ url_for('bulk_delete') }}" class="btn btn-sm btn-danger">Bulk Delete</button>
+        </div>
+      </div>
+      
+      <!-- Channel Listing Table -->
+      <h5>All Channels</h5>
+      {% if channels %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col"><input type="checkbox" id="select-all"></th>
+            <th scope="col">Logo</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for channel in channels %}
+          <tr>
+            <td>
+              <input type="checkbox" name="channel_ids" value="{{ channel.id }}">
+            </td>
+            <td>
+              {% if channel.logo %}
+                <img src="{{ channel.logo }}" alt="{{ channel.name }}" class="img-thumbnail" style="max-width:50px; max-height:50px;" 
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/50?text=No+Image';">
+              {% else %}
+                <span class="badge bg-secondary">No Logo</span>
+              {% endif %}
+            </td>
+            <td>{{ channel.name }}</td>
+            <td>{{ channel.category or 'N/A' }}</td>
+            <td>{{ channel.state.capitalize() }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No channels available.</p>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<script>
+// Toggle all checkboxes
+document.getElementById('select-all')?.addEventListener('change', function(){
+  const checkboxes = document.querySelectorAll('input[name="channel_ids"]');
+  checkboxes.forEach(cb => cb.checked = this.checked);
+});
+</script>
+{% endblock %}
