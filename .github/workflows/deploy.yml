@@ -23,5 +23,3 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           local-dir: .
           server-dir: /view-iptv.stream/
-          secure: true
-
