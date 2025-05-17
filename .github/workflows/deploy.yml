@@ -1,25 +1,12 @@
-name: Deploy via FTPS
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.SFTP_HOST }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          protocol: ftps
-          port: ${{ secrets.SFTP_PORT }}
-          local-dir: ./
-          server-dir: /view-iptv.stream/
+- name: Deploy via FTPS
+  uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+  with:
+    server: ${{ secrets.SFTP_HOST }}
+    username: ${{ secrets.SFTP_USERNAME }}
+    password: ${{ secrets.SFTP_PASSWORD }}
+    protocol: ftps
+    port: ${{ secrets.SFTP_PORT }}
+    local-dir: ./
+    server-dir: /view-iptv.stream/
+    timeout: 120000
+    log-level: verbose
