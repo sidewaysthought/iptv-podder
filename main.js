@@ -2,6 +2,12 @@ let hls = null;
 let activeLi = null;
 let currentPlaylist = null;
 
+// Enable verbose logging when ?debug is present in the URL
+const DEBUG = new URLSearchParams(window.location.search).has("debug");
+function debugLog(...args) {
+  if (DEBUG) console.log("[DEBUG]", ...args);
+}
+
 const shareBtn = document.getElementById("shareBtn");
 const shareMenu = document.getElementById("shareMenu");
 const sharePlaylistBtn = document.getElementById("sharePlaylistBtn");
@@ -37,6 +43,7 @@ window.addEventListener("resize", adjustPlaylistHeight);
 
 
 shareBtn.addEventListener("click", () => {
+  debugLog("Toggling share menu");
   const hidden = shareMenu.classList.toggle("hidden");
   shareBtn.setAttribute("aria-expanded", String(!hidden));
   updateShareMenuState();
@@ -50,6 +57,7 @@ document.addEventListener("click", (e) => {
 
 sharePlaylistBtn.addEventListener("click", () => {
   if (sharePlaylistBtn.disabled) return;
+  debugLog("Sharing playlist");
   const url = new URL(window.location);
   url.searchParams.delete("program");
   doShare(url.toString());
@@ -58,6 +66,7 @@ sharePlaylistBtn.addEventListener("click", () => {
 
 shareVideoBtn.addEventListener("click", () => {
   if (shareVideoBtn.disabled) return;
+  debugLog("Sharing playlist + video");
   const url = new URL(window.location);
   doShare(url.toString());
   hideShareMenu();
@@ -65,21 +74,26 @@ shareVideoBtn.addEventListener("click", () => {
 
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.trim().toLowerCase();
+    debugLog("Filtering", term);
     [...streamList.children].forEach((li) => {
         li.classList.toggle("hidden", !li.dataset.label?.toLowerCase().includes(term));
     });
 });
 
 // Show placeholder on first load
+debugLog("Initial placeholder");
 showPlaceholder();
 
 async function fetchAndRender() {
     const url = manifestInput.value.trim();
     if (!url) return alert("Enter a playlist URL.");
 
+    debugLog("Fetching playlist", url);
+
     try {
         const text = await fetchWithProxy(url);
         const items = parsePlaylist(url, text);
+        debugLog("Parsed", items.length, "items from", url);
         renderList(items);
         searchWrap.classList.toggle("hidden", items.length < 8);
         updateUrlParams({ playlist: url, program: null });
@@ -87,16 +101,19 @@ async function fetchAndRender() {
         updateShareMenuState();
     } catch (err) {
         console.error(err);
+        debugLog("Fetch failed", err.message);
         alert(`Failed: ${err.message}. Server must allow CORS or try the proxy.`);
     }
 }
 
 async function fetchWithProxy(url) {
     try {
+        debugLog("Fetching directly", url);
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return await res.text();
     } catch (err) {
+        debugLog("Direct fetch failed", err.message, "- trying proxy");
         const proxied = await fetch(`proxy.php?url=${encodeURIComponent(url)}`);
         if (!proxied.ok) throw new Error(`Proxy HTTP ${proxied.status}`);
         return await proxied.text();
@@ -199,12 +216,14 @@ function renderList(items) {
 }
 
 function showPlaceholder() {
+    debugLog("Showing placeholder");
     streamList.innerHTML = '<li class="text-gray-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</li>';
     currentPlaylist = null;
     updateShareMenuState();
 }
 
 function play(url, li) {
+    debugLog("Playing", url);
     // Reset icons on previous active entry
     if (activeLi) {
         activeLi.querySelector(".playIcon").classList.add("hidden");
@@ -307,11 +326,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function hideShareMenu() {
+  debugLog("Hiding share menu");
   shareMenu.classList.add("hidden");
   shareBtn.setAttribute("aria-expanded", "false");
 }
 
 function updateShareMenuState() {
+  if (!sharePlaylistBtn || !shareVideoBtn) {
+    debugLog("Share buttons missing - skipping update");
+    return;
+  }
   sharePlaylistBtn.disabled = !currentPlaylist;
   shareVideoBtn.disabled = !activeLi;
 }
