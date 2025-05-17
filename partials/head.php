@@ -14,13 +14,5 @@ if (empty($pageTitle)) {
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- hls.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZPE4RCPT1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-TZPE4RCPT1');
-    </script>
+    <?php include 'partials/analytics.php'; ?>
 </head>
