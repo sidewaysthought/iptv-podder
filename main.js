@@ -26,7 +26,13 @@ function adjustPlaylistHeight() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", adjustPlaylistHeight);
+document.addEventListener("DOMContentLoaded", () => {
+    adjustPlaylistHeight();
+    if (window.ResizeObserver) {
+        const ro = new ResizeObserver(adjustPlaylistHeight);
+        ro.observe(playerWrapper);
+    }
+});
 window.addEventListener("resize", adjustPlaylistHeight);
 
 
@@ -104,13 +110,17 @@ function parsePlaylist(baseUrl, text) {
                     .split(/\s(?=\w+=)/) // space before key=
                     .map((kv) => kv.split("=").map((v) => v.replace(/^"|"$/g, "")))
             );
-            const uri = resolveUrl(baseUrl, lines[i + 1]);
-            streams.push({
-                uri,
-                label: attrs["tvg-name"] || attrs["tvg-id"] || name,
-                group: attrs["group-title"] || "",
-            });
-            i++; // consume URI
+            if (lines[i + 1]) {
+                const uri = resolveUrl(baseUrl, lines[i + 1]);
+                streams.push({
+                    uri,
+                    label: attrs["tvg-name"] || attrs["tvg-id"] || name,
+                    group: attrs["group-title"] || "",
+                });
+                i++; // consume URI
+            } else {
+                console.warn("Missing URI after", line);
+            }
             continue;
         }
 
@@ -122,13 +132,17 @@ function parsePlaylist(baseUrl, text) {
                     .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
                     .map((kv) => kv.split("=").map((v) => v.replace(/^"|"$/g, "")))
             );
-            const uri = resolveUrl(baseUrl, lines[i + 1]);
-            streams.push({
-                uri,
-                label: `${attrs.RESOLUTION || "Auto"} • ${attrs.BANDWIDTH ? attrs.BANDWIDTH / 1000 + " kbps" : ""}`.trim(),
-                group: "Variants",
-            });
-            i++;
+            if (lines[i + 1]) {
+                const uri = resolveUrl(baseUrl, lines[i + 1]);
+                streams.push({
+                    uri,
+                    label: `${attrs.RESOLUTION || "Auto"} • ${attrs.BANDWIDTH ? attrs.BANDWIDTH / 1000 + " kbps" : ""}`.trim(),
+                    group: "Variants",
+                });
+                i++;
+            } else {
+                console.warn("Missing URI after", line);
+            }
         }
     }
 
@@ -151,11 +165,23 @@ function renderList(items) {
         li.dataset.label = item.label;
         li.dataset.uri = item.uri;
         li.className = "cursor-pointer hover:underline flex items-center";
-        li.innerHTML = `
-    <span>${item.label || `Stream ${idx + 1}`}</span>
-    <span class="playIcon ml-1 hidden" aria-label="playing">▶️</span>
-    <span class="errorIcon ml-1 hidden text-red-500" aria-label="error">🚫</span>
-  `;
+
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = item.label || `Stream ${idx + 1}`;
+        li.appendChild(nameSpan);
+
+        const playIcon = document.createElement("span");
+        playIcon.className = "playIcon ml-1 hidden";
+        playIcon.setAttribute("aria-label", "playing");
+        playIcon.textContent = "▶";
+        li.appendChild(playIcon);
+
+        const errorIcon = document.createElement("span");
+        errorIcon.className = "errorIcon ml-1 hidden text-red-500";
+        errorIcon.setAttribute("aria-label", "error");
+        errorIcon.textContent = "🚫";
+        li.appendChild(errorIcon);
+
         li.title = item.group;
         li.addEventListener("click", () => play(item.uri, li));
         streamList.appendChild(li);
