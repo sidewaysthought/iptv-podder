@@ -1,39 +1,13 @@
+<?php $pageTitle = 'View IPTV | View-IPTV.stream'; ?>
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>View IPTV | VIew-IPTV.stream</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- hls.js -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TZPE4RCPT1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-TZPE4RCPT1');
-    </script>
-</head>
-
+<?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
     </nav>
-    <!-- Site Navigation -->
-    <header class="bg-gray-200">
-        <div class="container mx-auto max-w-6xl flex justify-between items-center p-4">
-            <div class="font-semibold">View-IPTV.stream</div>
-            <nav class="space-x-4">
-                <a href="index.html" class="text-blue-600 hover:underline">Home</a>
-            </nav>
-        </div>
-    </header>
+    <?php include 'partials/header.php'; ?>
     <main class="container mx-auto p-6 max-w-6xl">
         <!-- Header -->
         <header class="mb-4">
@@ -76,15 +50,7 @@
             </section>
         </div>
     </main>
-
-    <footer class="bg-gray-200 text-center py-4 mt-8">
-        <p class="font-semibold">View-IPTV.stream</p>
-        <p>Copyright &copy; 2025 Sideways Thought LLC.</p>
-        <p><a href="#" class="text-blue-600 hover:underline">Contact Us</a></p>
-        <p><a href="privacy.html" class="text-blue-600 hover:underline">Privacy Policy</a></p>
-    </footer>
-
+    <?php include 'partials/footer.php'; ?>
     <script src="main.js"></script>
 </body>
-
 </html>
