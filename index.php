@@ -1,4 +1,4 @@
-<?php $pageTitle = 'View IPTV | View-IPTV.stream'; ?>
+<?php $pageTitle = 'View IPTV'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
@@ -7,10 +7,7 @@
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
     </nav>
-    <?php 
-    $pageTitle = "Home";
-    include 'partials/header.php'; 
-    ?>
+    <?php include 'partials/header.php'; ?>
     <main class="container mx-auto p-6 max-w-6xl">
         <!-- Header -->
         <header class="mb-4">

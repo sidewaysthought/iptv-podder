@@ -1,4 +1,4 @@
-<?php $pageTitle = 'Privacy Policy | View-IPTV.stream'; ?>
+<?php $pageTitle = 'Privacy Policy'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
@@ -14,9 +14,9 @@
         </header>
         <section class="space-y-4">
             <p>
-                This Privacy Policy ("Policy") applies to VIew-IPTV.stream and SIdeways
+                This Privacy Policy ("Policy") applies to View-IPTV.stream and Sideways
                 Thought LLC ("Company") and governs data collection and usage. Unless
-                otherwise noted, all references to the Company include View-IPTV.site. The
+                otherwise noted, all references to the Company include View-IPTV.stream. The
                 Company's application is a stream playlist viewer and information site. By
                 using the application, you consent to the data practices described in this
                 statement.
@@ -94,7 +94,7 @@
                 you believe that the Company has not adhered to it, please contact us at:
             </p>
             <address class="not-italic space-y-1">
-                <div>SIdeways Thought LLC</div>
+                <div>Sideways Thought LLC</div>
                 <div>777 N Jefferson St</div>
                 <div>Suite 408 PMB 1023</div>
                 <div>Milwaukee, Wisconsin 53202</div>
