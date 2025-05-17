@@ -30,6 +30,7 @@ async function fetchAndRender() {
         const items = parsePlaylist(url, text);
         renderList(items);
         searchWrap.classList.toggle("hidden", items.length < 8);
+        updateUrlParams({ playlist: url, program: null });
     } catch (err) {
         console.error(err);
         alert(`Failed: ${err.message}. Server must allow CORS.`);
@@ -132,21 +133,31 @@ function play(url, li) {
 
     const isHls = /\.m3u8($|\?)/i.test(url);
 
+    const onLoaded = () => {
+        updateUrlParams({ program: url });
+        video.removeEventListener("error", onError);
+    };
+
+    const onError = () => {
+        video.removeEventListener("loadedmetadata", onLoaded);
+        setErrorIcon(li);
+    };
+
+    video.addEventListener("loadedmetadata", onLoaded, { once: true });
+    video.addEventListener("error", onError, { once: true });
+
     if (isHls && Hls.isSupported()) {
         hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(video);
         hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) setErrorIcon(li);
+            if (data.fatal) onError();
         });
     } else {
         video.src = url;
     }
 
-    // Error handler for native element
-    video.onerror = () => setErrorIcon(li);
-
-    video.play().catch(() => setErrorIcon(li));
+    video.play().catch(onError);
 
     setPlayIcon(li);
     activeLi = li;
@@ -168,4 +179,16 @@ function resolveUrl(base, path) {
     } catch {
         return path;
     }
+}
+
+function updateUrlParams(params) {
+    const url = new URL(window.location);
+    for (const [key, value] of Object.entries(params)) {
+        if (value === null || value === undefined) {
+            url.searchParams.delete(key);
+        } else {
+            url.searchParams.set(key, value);
+        }
+    }
+    history.replaceState(null, "", url);
 }
