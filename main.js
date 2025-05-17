@@ -97,6 +97,7 @@ function renderList(items) {
     items.forEach((item, idx) => {
         const li = document.createElement("li");
         li.dataset.label = item.label;
+        li.dataset.uri = item.uri;
         li.className = "cursor-pointer hover:underline flex items-center";
         li.innerHTML = `
     <span>${item.label || `Stream ${idx + 1}`}</span>
@@ -164,11 +165,13 @@ function play(url, li) {
 }
 
 function setPlayIcon(li) {
+    if (!li) return;
     li.querySelector(".errorIcon").classList.add("hidden");
     li.querySelector(".playIcon").classList.remove("hidden");
 }
 
 function setErrorIcon(li) {
+    if (!li) return;
     li.querySelector(".playIcon").classList.add("hidden");
     li.querySelector(".errorIcon").classList.remove("hidden");
 }
@@ -192,3 +195,22 @@ function updateUrlParams(params) {
     }
     history.replaceState(null, "", url);
 }
+
+// Auto-load playlist and program from URL parameters
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const playlist = params.get("playlist");
+    const program = params.get("program");
+
+    if (playlist) {
+        manifestInput.value = playlist;
+        fetchAndRender().then(() => {
+            if (program) {
+                const li = [...streamList.children].find(
+                    (el) => el.dataset.uri === program
+                );
+                play(program, li);
+            }
+        });
+    }
+});
