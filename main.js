@@ -34,6 +34,11 @@ function adjustPlaylistHeight() {
 
 document.addEventListener("DOMContentLoaded", () => {
     adjustPlaylistHeight();
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => {
+            debugLog('SW registration failed', err);
+        });
+    }
     if (window.ResizeObserver) {
         const ro = new ResizeObserver(adjustPlaylistHeight);
         ro.observe(playerWrapper);
