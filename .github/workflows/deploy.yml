@@ -1,4 +1,4 @@
-name: Deploy SPA via SFTP
+name: Deploy via FTPS
 
 on:
   push:
@@ -10,14 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Upload build files via SFTP
-        uses: appleboy/scp-action@master
+      - name: Deploy via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          host: ${{ secrets.SFTP_HOST }}
+          server: ${{ secrets.SFTP_SERVER }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
-          source: "."
-          target: "/view-iptv.stream/"
+          protocol: ftps
+          port: ${{ secrets.SFTP_PORT }}
+          local-dir: .
+          server-dir: /view-iptv.stream/
+          secure: true
+
