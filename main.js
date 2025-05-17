@@ -78,9 +78,7 @@ async function fetchAndRender() {
     if (!url) return alert("Enter a playlist URL.");
 
     try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
+        const text = await fetchWithProxy(url);
         const items = parsePlaylist(url, text);
         renderList(items);
         searchWrap.classList.toggle("hidden", items.length < 8);
@@ -89,7 +87,19 @@ async function fetchAndRender() {
         updateShareMenuState();
     } catch (err) {
         console.error(err);
-        alert(`Failed: ${err.message}. Server must allow CORS.`);
+        alert(`Failed: ${err.message}. Server must allow CORS or try the proxy.`);
+    }
+}
+
+async function fetchWithProxy(url) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.text();
+    } catch (err) {
+        const proxied = await fetch(`proxy.php?url=${encodeURIComponent(url)}`);
+        if (!proxied.ok) throw new Error(`Proxy HTTP ${proxied.status}`);
+        return await proxied.text();
     }
 }
 
