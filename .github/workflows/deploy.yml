@@ -24,6 +24,6 @@ jobs:
         run: |
           lftp -u $FTP_USER,$FTP_PASS sftp://$FTP_HOST -e "
             set sftp:auto-confirm yes
-            mirror -R ./ /view-iptv.stream/
+            mirror -R ./ view-iptv.stream/
             bye
           "
