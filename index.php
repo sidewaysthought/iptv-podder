@@ -15,7 +15,6 @@
         <!-- Header -->
         <header class="mb-4">
             <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
-            <h2 class="text-lg text-gray-500 mb-2">view-iptv.stream</h2>
             <p class="text-gray-600">
                 Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
                 streams and play them on click (HLS supported via <code>hls.js</code>).
@@ -48,8 +47,9 @@
 
             <!-- Player -->
             <section class="flex-1">
-                <video id="videoPlayer" class="w-full h-[70vh] rounded shadow-lg bg-black" controls
-                    preload="metadata"></video>
+                <div class="relative w-full" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                    <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
+                </div>
             </section>
         </div>
     </main>
