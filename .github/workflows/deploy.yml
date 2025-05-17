@@ -1,4 +1,4 @@
-name: Deploy via SFTP
+name: Deploy via SFTP with lftp
 
 on:
   push:
@@ -11,14 +11,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Upload files via SFTP
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.SFTP_HOST }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          port: 22
-          source: "./"
-          target: "/view-iptv.stream/" # Your remote path
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Deploy files via SFTP using lftp
+        env:
+          FTP_HOST: ${{ secrets.SFTP_HOST }}
+          FTP_USER: ${{ secrets.SFTP_USERNAME }}
+          FTP_PASS: ${{ secrets.SFTP_PASSWORD }}
+        run: |
+          lftp -u $FTP_USER,$FTP_PASS -e "
+            set sftp:auto-confirm yes
+            mirror -R ./ /view-iptv.stream/
+            bye
+          " sftp://$FTP_HOST
