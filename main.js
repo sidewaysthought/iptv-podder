@@ -29,6 +29,7 @@ function adjustPlaylistHeight() {
 document.addEventListener("DOMContentLoaded", adjustPlaylistHeight);
 window.addEventListener("resize", adjustPlaylistHeight);
 
+
 shareBtn.addEventListener("click", () => {
   const hidden = shareMenu.classList.toggle("hidden");
   shareBtn.setAttribute("aria-expanded", String(!hidden));
@@ -219,11 +220,13 @@ function play(url, li) {
 }
 
 function setPlayIcon(li) {
+    if (!li) return;
     li.querySelector(".errorIcon").classList.add("hidden");
     li.querySelector(".playIcon").classList.remove("hidden");
 }
 
 function setErrorIcon(li) {
+    if (!li) return;
     li.querySelector(".playIcon").classList.add("hidden");
     li.querySelector(".errorIcon").classList.remove("hidden");
 }
