@@ -43,6 +43,10 @@
 
                 <!-- Streams list -->
                 <ul id="streamList" class="flex-1 overflow-y-auto space-y-1 text-blue-700 p-2 pr-3"></ul>
+                <div class="border-t text-xs text-gray-700 p-2 space-x-4" aria-label="Legend">
+                    <span><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> = playing</span>
+                    <span><span aria-hidden="true" class="text-red-500">🚫</span> <span class="sr-only">Error</span> = failed</span>
+                </div>
             </aside>
 
             <!-- Player -->
