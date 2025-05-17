@@ -42,16 +42,18 @@
                 </div>
 
                 <!-- Streams list -->
-                <ul id="streamList" class="flex-1 overflow-y-auto space-y-1 text-blue-700 p-2 pr-3"></ul>
-                <div class="border-t text-xs text-gray-700 p-2 space-x-4" aria-label="Legend">
-                    <span><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> = playing</span>
-                    <span><span aria-hidden="true" class="text-red-500">🚫</span> <span class="sr-only">Error</span> = failed</span>
+                <div id="listWrapper" class="flex-1 overflow-y-auto">
+                    <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3"></ul>
+                    <div class="border-t text-xs text-gray-700 p-2 space-x-4 mt-2" aria-label="Legend">
+                        <span><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> = playing</span>
+                        <span><span aria-hidden="true" class="text-red-500">🚫</span> <span class="sr-only">Error</span> = failed</span>
+                    </div>
                 </div>
             </aside>
 
             <!-- Player -->
             <section class="flex-1">
-                <div id="playerWrapper" class="relative w-full" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                <div id="playerWrapper" class="relative w-full aspect-video"> <!-- 16:9 Aspect Ratio -->
                     <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
                 </div>
             </section>
