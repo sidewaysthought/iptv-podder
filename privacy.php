@@ -1,15 +1,12 @@
+<?php $pageTitle = 'Privacy Policy | View-IPTV.stream'; ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Privacy Policy | VIew-IPTV.stream</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+<?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#policy" class="block">Skip to content</a>
     </nav>
+    <?php include 'partials/header.php'; ?>
     <main id="policy" tabindex="-1" class="container mx-auto p-6 max-w-5xl space-y-6">
         <header class="space-y-2">
             <h1 class="text-3xl font-bold">Privacy Policy</h1>
@@ -106,10 +103,6 @@
             </address>
         </section>
     </main>
-    <footer class="bg-gray-200 text-center py-4 mt-8">
-        <p class="font-semibold">View-IPTV.stream</p>
-        <p>Copyright &copy; 2025 Sideways Thought LLC.</p>
-        <p><a href="index.html" class="text-blue-600 hover:underline">Return to home</a></p>
-    </footer>
+    <?php include 'partials/footer.php'; ?>
 </body>
 </html>
