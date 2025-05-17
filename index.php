@@ -28,6 +28,20 @@
             <button id="loadBtn" class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
                 Load
             </button>
+            <div class="relative flex items-center">
+                <button id="shareBtn" aria-haspopup="true" aria-expanded="false" class="px-2 text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
+                        <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
+                        <rect x="5" y="14" width="14" height="6" rx="1" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="sr-only">Share</span>
+                </button>
+                <div id="shareMenu" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden">
+                    <button id="sharePlaylistBtn" class="block w-full text-left px-2 py-1 hover:bg-gray-100 disabled:opacity-50" disabled>Share playlist</button>
+                    <button id="shareVideoBtn" class="block w-full text-left px-2 py-1 hover:bg-gray-100 disabled:opacity-50" disabled>Share playlist &amp; video</button>
+                </div>
+            </div>
         </div>
 
         <!-- Two‑column layout -->
