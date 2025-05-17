@@ -17,7 +17,7 @@
             <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
             <p class="text-gray-600">
                 Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
-                streams and play them on click (HLS supported via <code>hls.js</code>).
+                streams and play them on click.
             </p>
         </header>
 
