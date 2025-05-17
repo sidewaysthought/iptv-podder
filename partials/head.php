@@ -1,4 +1,11 @@
-<?php $pageTitle = $pageTitle ?? 'View-IPTV.stream'; ?>
+<?php
+// Set the page title logic
+if (empty($pageTitle)) {
+    $pageTitle = 'View-IPTV.stream';
+} else {
+    $pageTitle = $pageTitle . ' | View-IPTV.stream';
+}
+?>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -7,7 +7,10 @@
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
     </nav>
-    <?php include 'partials/header.php'; ?>
+    <?php 
+    $pageTitle = "Home";
+    include 'partials/header.php'; 
+    ?>
     <main class="container mx-auto p-6 max-w-6xl">
         <!-- Header -->
         <header class="mb-4">
