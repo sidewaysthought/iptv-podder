@@ -1,13 +1,60 @@
 let hls = null;
 let activeLi = null;
+let currentPlaylist = null;
+
+const shareBtn = document.getElementById("shareBtn");
+const shareMenu = document.getElementById("shareMenu");
+const sharePlaylistBtn = document.getElementById("sharePlaylistBtn");
+const shareVideoBtn = document.getElementById("shareVideoBtn");
 const loadBtn = document.getElementById("loadBtn");
 const manifestInput = document.getElementById("manifestUrl");
 const streamList = document.getElementById("streamList");
 const searchWrap = document.getElementById("searchWrap");
 const searchInput = document.getElementById("searchInput");
 const video = document.getElementById("videoPlayer");
+const playlistContainer = document.getElementById("playlistContainer");
+const playerWrapper = document.getElementById("playerWrapper");
 
 loadBtn.addEventListener("click", fetchAndRender);
+
+function adjustPlaylistHeight() {
+    if (!playlistContainer || !playerWrapper) return;
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+        playlistContainer.style.height = playerWrapper.offsetHeight + "px";
+    } else {
+        playlistContainer.style.height = "";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", adjustPlaylistHeight);
+window.addEventListener("resize", adjustPlaylistHeight);
+
+shareBtn.addEventListener("click", () => {
+  const hidden = shareMenu.classList.toggle("hidden");
+  shareBtn.setAttribute("aria-expanded", String(!hidden));
+  updateShareMenuState();
+});
+
+document.addEventListener("click", (e) => {
+  if (!shareBtn.contains(e.target) && !shareMenu.contains(e.target)) {
+    hideShareMenu();
+  }
+});
+
+sharePlaylistBtn.addEventListener("click", () => {
+  if (sharePlaylistBtn.disabled) return;
+  const url = new URL(window.location);
+  url.searchParams.delete("program");
+  doShare(url.toString());
+  hideShareMenu();
+});
+
+shareVideoBtn.addEventListener("click", () => {
+  if (shareVideoBtn.disabled) return;
+  const url = new URL(window.location);
+  doShare(url.toString());
+  hideShareMenu();
+});
 
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.trim().toLowerCase();
@@ -31,6 +78,8 @@ async function fetchAndRender() {
         renderList(items);
         searchWrap.classList.toggle("hidden", items.length < 8);
         updateUrlParams({ playlist: url, program: null });
+        currentPlaylist = items.length ? url : null;
+        updateShareMenuState();
     } catch (err) {
         console.error(err);
         alert(`Failed: ${err.message}. Server must allow CORS.`);
@@ -94,9 +143,12 @@ function renderList(items) {
         return;
     }
 
+    updateShareMenuState();
+
     items.forEach((item, idx) => {
         const li = document.createElement("li");
         li.dataset.label = item.label;
+        li.dataset.uri = item.uri;
         li.className = "cursor-pointer hover:underline flex items-center";
         li.innerHTML = `
     <span>${item.label || `Stream ${idx + 1}`}</span>
@@ -111,6 +163,8 @@ function renderList(items) {
 
 function showPlaceholder() {
     streamList.innerHTML = '<li class="text-gray-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</li>';
+    currentPlaylist = null;
+    updateShareMenuState();
 }
 
 function play(url, li) {
@@ -161,6 +215,7 @@ function play(url, li) {
 
     setPlayIcon(li);
     activeLi = li;
+    updateShareMenuState();
 }
 
 function setPlayIcon(li) {
@@ -191,4 +246,41 @@ function updateUrlParams(params) {
         }
     }
     history.replaceState(null, "", url);
+}
+
+// Auto-load playlist and program from URL parameters
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const playlist = params.get("playlist");
+    const program = params.get("program");
+
+    if (playlist) {
+        manifestInput.value = playlist;
+        fetchAndRender().then(() => {
+            if (program) {
+                const li = [...streamList.children].find(
+                    (el) => el.dataset.uri === program
+                );
+                play(program, li);
+            }
+        });
+    }
+});
+
+function hideShareMenu() {
+  shareMenu.classList.add("hidden");
+  shareBtn.setAttribute("aria-expanded", "false");
+}
+
+function updateShareMenuState() {
+  sharePlaylistBtn.disabled = !currentPlaylist;
+  shareVideoBtn.disabled = !activeLi;
+}
+
+function doShare(url) {
+  if (navigator.share) {
+    navigator.share({ url }).catch(() => {});
+  } else {
+    prompt("Copy this link:", url);
+  }
 }
