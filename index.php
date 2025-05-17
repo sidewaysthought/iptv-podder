@@ -33,8 +33,8 @@
         <!-- Two‑column layout -->
         <div class="flex flex-col lg:flex-row gap-4 mt-6">
             <!-- Sidebar: search + list -->
-            <aside
-                class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm h-[70vh] overflow-hidden bg-white">
+            <aside id="playlistContainer"
+                class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm overflow-hidden bg-white">
                 <!-- Search -->
                 <div id="searchWrap" class="hidden p-2 border-b border-gray-200">
                     <input id="searchInput" type="text" placeholder="Filter channels..."
@@ -47,7 +47,7 @@
 
             <!-- Player -->
             <section class="flex-1">
-                <div class="relative w-full" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                <div id="playerWrapper" class="relative w-full" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
                     <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
                 </div>
             </section>

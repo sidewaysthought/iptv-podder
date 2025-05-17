@@ -6,8 +6,22 @@ const streamList = document.getElementById("streamList");
 const searchWrap = document.getElementById("searchWrap");
 const searchInput = document.getElementById("searchInput");
 const video = document.getElementById("videoPlayer");
+const playlistContainer = document.getElementById("playlistContainer");
+const playerWrapper = document.getElementById("playerWrapper");
 
 loadBtn.addEventListener("click", fetchAndRender);
+
+function adjustPlaylistHeight() {
+    if (!playlistContainer || !playerWrapper) return;
+    if (window.matchMedia("(min-width: 1024px)").matches) {
+        playlistContainer.style.height = playerWrapper.offsetHeight + "px";
+    } else {
+        playlistContainer.style.height = "";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", adjustPlaylistHeight);
+window.addEventListener("resize", adjustPlaylistHeight);
 
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.trim().toLowerCase();
