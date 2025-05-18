@@ -453,7 +453,11 @@ function applyTheme(value) {
 }
 
 function loadTheme() {
-  const saved = localStorage.getItem("theme") || "system";
+  let saved = localStorage.getItem("theme");
+  if (!saved) {
+    saved = "system";
+    localStorage.setItem("theme", saved);
+  }
   if (themeSelect) themeSelect.value = saved;
   applyTheme(saved);
 }
