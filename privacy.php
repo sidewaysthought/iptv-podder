@@ -1,4 +1,7 @@
-<?php $pageTitle = 'Privacy Policy'; ?>
+<?php
+session_start();
+$pageTitle = 'Privacy Policy';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>

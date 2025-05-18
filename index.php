@@ -1,4 +1,8 @@
-<?php $pageTitle = 'View IPTV'; ?>
+<?php
+session_start();
+$_SESSION['user_active'] = true;
+$pageTitle = 'View IPTV';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
