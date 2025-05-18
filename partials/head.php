@@ -11,31 +11,7 @@ if (empty($pageTitle)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo htmlspecialchars($pageTitle); ?></title>
     <!-- Tailwind CSS -->
-    <script>
-        tailwind.config = { darkMode: 'class' };
-    </script>
-    <script>
-        (function() {
-            let theme = localStorage.getItem('theme');
-            if (!theme) {
-                theme = 'system';
-                localStorage.setItem('theme', theme);
-            }
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else if (theme === 'light') {
-                document.documentElement.classList.remove('dark');
-            } else {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            }
-        })();
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-RXf+QSDCUQs5u3F4dmkB9pGwBuiJTqXrE2RzYhWnEfZ1CMBYHZB+m0XXq20s96VdY+U2/6YdEcXkoP4zTPU3HQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- hls.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <?php include 'partials/analytics.php'; ?>
