@@ -63,6 +63,28 @@ function rate_limit() {
     }
 }
 
+function public_ip_addresses($host) {
+    $records = @dns_get_record($host, DNS_A | DNS_AAAA);
+    if (!$records) {
+        return [];
+    }
+    $ips = [];
+    foreach ($records as $rec) {
+        $ip = $rec['ip'] ?? ($rec['ipv6'] ?? null);
+        if (!$ip) {
+            continue;
+        }
+        if (filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            ) !== false) {
+            $ips[] = $ip;
+        }
+    }
+    return $ips;
+}
+
 cleanup_cache();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -124,8 +146,8 @@ if (!preg_match('/\.m3u8?$/', $path)) {
     exit;
 }
 
-$resolved = gethostbyname($parts['host']);
-if (filter_var($resolved, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+$ips = public_ip_addresses($parts['host']);
+if (!$ips) {
     http_response_code(400);
     echo "Refusing private address";
     exit;
@@ -158,6 +180,13 @@ if (isset($_SESSION['proxy_cache'][$key]) && $_SESSION['proxy_cache'][$key]['tim
         return strlen($chunk);
     });
     curl_exec($ch);
+    $primary = curl_getinfo($ch, CURLINFO_PRIMARY_IP);
+    if ($primary && filter_var($primary, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+        http_response_code(400);
+        echo 'Refusing private address';
+        curl_close($ch);
+        exit;
+    }
     $http = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
     if ($http >= 300 && $http < 400) {
         http_response_code(502);
