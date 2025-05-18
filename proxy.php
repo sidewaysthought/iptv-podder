@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (empty($_SESSION['user_active'])) {
+    http_response_code(403);
+    echo 'Session required';
+    exit;
+}
 
 // Configuration
 define('CACHE_TTL', 300); // 5 minutes
