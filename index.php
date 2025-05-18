@@ -24,11 +24,22 @@ $pageTitle = 'View IPTV';
 
         <!-- Controls -->
         <div id="playlistForm" tabindex="-1" class="flex flex-col sm:flex-row gap-2 mt-4">
-            <input id="manifestUrl" type="url" placeholder="https://example.com/playlist.m3u8"
+            <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
                 class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
+            <datalist id="history"></datalist>
             <button id="loadBtn" class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
                 Load
             </button>
+            <div class="relative flex items-center">
+                <button id="historyBtn" aria-haspopup="true" aria-expanded="false" class="px-2 text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
+                        <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="sr-only">History</span>
+                </button>
+                <div id="historyMenu" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden"></div>
+            </div>
             <div class="relative flex items-center">
                 <button id="shareBtn" aria-haspopup="true" aria-expanded="false" class="px-2 text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
