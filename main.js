@@ -431,3 +431,67 @@ function doShare(url) {
     prompt("Copy this link:", url);
   }
 }
+
+// ------- Theme settings -------
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsModal = document.getElementById("settingsModal");
+const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+const themeSelect = document.getElementById("themeSelect");
+
+function applyTheme(value) {
+  if (value === "dark") {
+    document.documentElement.classList.add("dark");
+  } else if (value === "light") {
+    document.documentElement.classList.remove("dark");
+  } else {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem("theme") || "system";
+  if (themeSelect) themeSelect.value = saved;
+  applyTheme(saved);
+}
+
+function saveTheme(value) {
+  localStorage.setItem("theme", value);
+  applyTheme(value);
+}
+
+if (settingsBtn && settingsModal && closeSettingsBtn && themeSelect) {
+  settingsBtn.addEventListener("click", () => {
+    settingsModal.classList.remove("hidden");
+    themeSelect.focus();
+  });
+
+  closeSettingsBtn.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+    settingsBtn.focus();
+  });
+
+  settingsModal.addEventListener("click", (e) => {
+    if (e.target === settingsModal) {
+      settingsModal.classList.add("hidden");
+      settingsBtn.focus();
+    }
+  });
+
+  themeSelect.addEventListener("change", () => {
+    saveTheme(themeSelect.value);
+  });
+
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      if ((localStorage.getItem("theme") || "system") === "system") {
+        applyTheme("system");
+      }
+    });
+
+  document.addEventListener("DOMContentLoaded", loadTheme);
+}
