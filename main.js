@@ -275,26 +275,37 @@ function renderList(items) {
         const li = document.createElement("li");
         li.dataset.label = item.label;
         li.dataset.uri = item.uri;
-        li.className = "cursor-pointer hover:underline flex items-center";
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "w-full text-left cursor-pointer hover:underline flex items-center focus:outline-none focus:ring";
 
         const nameSpan = document.createElement("span");
         nameSpan.textContent = item.label || `Stream ${idx + 1}`;
-        li.appendChild(nameSpan);
+        btn.appendChild(nameSpan);
 
         const playIcon = document.createElement("span");
         playIcon.className = "playIcon ml-1 hidden";
         playIcon.setAttribute("aria-label", "playing");
         playIcon.textContent = "▶";
-        li.appendChild(playIcon);
+        btn.appendChild(playIcon);
 
         const errorIcon = document.createElement("span");
         errorIcon.className = "errorIcon ml-1 hidden text-red-500";
         errorIcon.setAttribute("aria-label", "error");
         errorIcon.textContent = "🚫";
-        li.appendChild(errorIcon);
+        btn.appendChild(errorIcon);
 
         li.title = item.group;
-        li.addEventListener("click", () => play(item.uri, li));
+        btn.addEventListener("click", () => play(item.uri, li));
+        btn.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                play(item.uri, li);
+            }
+        });
+
+        li.appendChild(btn);
         streamList.appendChild(li);
     });
 }
