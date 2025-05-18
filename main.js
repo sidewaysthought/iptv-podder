@@ -493,5 +493,9 @@ if (settingsBtn && settingsModal && closeSettingsBtn && themeSelect) {
       }
     });
 
-  document.addEventListener("DOMContentLoaded", loadTheme);
+  if (document.readyState !== "loading") {
+    loadTheme();
+  } else {
+    document.addEventListener("DOMContentLoaded", loadTheme);
+  }
 }
