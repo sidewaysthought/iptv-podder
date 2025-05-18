@@ -24,6 +24,7 @@ $pageTitle = 'View IPTV';
 
         <!-- Controls -->
         <div id="playlistForm" tabindex="-1" class="flex flex-col sm:flex-row gap-2 mt-4">
+            <label for="manifestUrl" class="sr-only">Playlist URL</label>
             <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
                 class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
             <datalist id="history"></datalist>
