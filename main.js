@@ -14,6 +14,9 @@ const sharePlaylistBtn = document.getElementById("sharePlaylistBtn");
 const shareVideoBtn = document.getElementById("shareVideoBtn");
 const loadBtn = document.getElementById("loadBtn");
 const manifestInput = document.getElementById("manifestUrl");
+const historyList = document.getElementById("history");
+const historyBtn = document.getElementById("historyBtn");
+const historyMenu = document.getElementById("historyMenu");
 const streamList = document.getElementById("streamList");
 const searchWrap = document.getElementById("searchWrap");
 const searchInput = document.getElementById("searchInput");
@@ -21,7 +24,81 @@ const video = document.getElementById("videoPlayer");
 const playlistContainer = document.getElementById("playlistContainer");
 const playerWrapper = document.getElementById("playerWrapper");
 
+const HISTORY_KEY = "history";
+
+function loadHistory() {
+    try {
+        const arr = JSON.parse(localStorage.getItem(HISTORY_KEY));
+        return Array.isArray(arr) ? arr : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveHistory(arr) {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+}
+
+function populateHistory() {
+    const history = loadHistory();
+    if (historyList) {
+        historyList.innerHTML = "";
+        history.forEach((u) => {
+            const opt = document.createElement("option");
+            opt.value = u;
+            historyList.appendChild(opt);
+        });
+    }
+    if (historyMenu) {
+        historyMenu.innerHTML = "";
+        if (!history.length) {
+            const span = document.createElement("span");
+            span.textContent = "No history";
+            span.className = "block px-2 py-1 text-gray-500";
+            historyMenu.appendChild(span);
+        } else {
+            history.forEach((u) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "block w-full text-left px-2 py-1 hover:bg-gray-100";
+                btn.textContent = u;
+                btn.addEventListener("click", () => {
+                    manifestInput.value = u;
+                    historyMenu.classList.add("hidden");
+                    historyBtn.setAttribute("aria-expanded", "false");
+                    manifestInput.focus();
+                });
+                historyMenu.appendChild(btn);
+            });
+        }
+    }
+}
+
+function addToHistory(url) {
+    let history = loadHistory();
+    history = history.filter((h) => h !== url);
+    history.unshift(url);
+    if (history.length > 20) history = history.slice(0, 20);
+    saveHistory(history);
+    populateHistory();
+}
+
 loadBtn.addEventListener("click", fetchAndRender);
+manifestInput.addEventListener("focus", populateHistory);
+if (historyBtn) {
+    historyBtn.addEventListener("click", () => {
+        populateHistory();
+        const hidden = historyMenu.classList.toggle("hidden");
+        historyBtn.setAttribute("aria-expanded", String(!hidden));
+    });
+}
+document.addEventListener("click", (e) => {
+    if (historyBtn && historyMenu &&
+        !historyBtn.contains(e.target) && !historyMenu.contains(e.target)) {
+        historyMenu.classList.add("hidden");
+        historyBtn.setAttribute("aria-expanded", "false");
+    }
+});
 
 function adjustPlaylistHeight() {
     if (!playlistContainer || !playerWrapper) return;
@@ -39,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             debugLog('SW registration failed', err);
         });
     }
+    populateHistory();
     if (window.ResizeObserver) {
         const ro = new ResizeObserver(adjustPlaylistHeight);
         ro.observe(playerWrapper);
@@ -104,6 +182,7 @@ async function fetchAndRender() {
         updateUrlParams({ playlist: url, program: null });
         currentPlaylist = items.length ? url : null;
         updateShareMenuState();
+        if (items.length) addToHistory(url);
     } catch (err) {
         console.error(err);
         debugLog("Fetch failed", err.message);
