@@ -3,7 +3,7 @@ session_start();
 
 // Configuration
 define('CACHE_TTL', 300); // 5 minutes
-define('MAX_DOWNLOAD_BYTES', 5 * 1024 * 1024); // 5 MB
+define('MAX_DOWNLOAD_BYTES', 3670016); // 3.5 MB
 define('RATE_LIMIT', 30); // requests
 define('RATE_WINDOW', 3600); // per hour
 define('RATE_DIR', sys_get_temp_dir() . '/proxy_rate');
@@ -60,6 +60,19 @@ function rate_limit() {
 
 cleanup_cache();
 
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo 'Method Not Allowed';
+    exit;
+}
+
+// ensure requests come over HTTPS/443
+if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') && ($_SERVER['SERVER_PORT'] ?? 0) != 443) {
+    http_response_code(403);
+    echo 'HTTPS required';
+    exit;
+}
+
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 $host = $_SERVER['HTTP_HOST'];
@@ -93,9 +106,16 @@ if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
 }
 
 $parts = parse_url($url);
-if (!in_array($parts['scheme'], ['http', 'https'])) {
+if (($parts['scheme'] ?? '') !== 'https') {
     http_response_code(400);
     echo "Invalid scheme";
+    exit;
+}
+
+$path = strtolower($parts['path'] ?? '');
+if (!preg_match('/\.m3u8?$/', $path)) {
+    http_response_code(400);
+    echo 'Invalid playlist extension';
     exit;
 }
 
@@ -120,7 +140,7 @@ if (isset($_SESSION['proxy_cache'][$key]) && $_SESSION['proxy_cache'][$key]['tim
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => false,
         CURLOPT_USERAGENT => 'IPTV-Proxy',
-        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_FOLLOWLOCATION => false,
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_TIMEOUT => 20,
     ]);
@@ -133,6 +153,13 @@ if (isset($_SESSION['proxy_cache'][$key]) && $_SESSION['proxy_cache'][$key]['tim
         return strlen($chunk);
     });
     curl_exec($ch);
+    $http = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    if ($http >= 300 && $http < 400) {
+        http_response_code(502);
+        echo 'Remote redirect not allowed';
+        curl_close($ch);
+        exit;
+    }
     if (curl_errno($ch) === CURLE_WRITE_ERROR && strlen($buffer) > MAX_DOWNLOAD_BYTES) {
         http_response_code(413);
         echo 'Response too large';
