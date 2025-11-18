@@ -325,44 +325,82 @@ function play(url, li) {
         activeLi.querySelector(".errorIcon").classList.add("hidden");
     }
 
-    // --- CLEAN UP PREVIOUS PLAYBACK ---
-    if (hls) {
-        hls.destroy();
-        hls = null;
-    }
-    // Pause & reset the video element to abort any ongoing network activity
-    video.pause();
-    video.removeAttribute("src");
-    video.load();
-    video.onerror = null; // clear previous handler
+    const resetPlayer = () => {
+        if (hls) {
+            hls.destroy();
+            hls = null;
+        }
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+        video.onerror = null;
+    };
 
+    const attempts = [];
     const isHls = /\.m3u8($|\?)/i.test(url);
+
+    // Keep the existing detection-based attempt first
+    if (isHls && Hls.isSupported()) {
+        attempts.push("hls");
+    } else {
+        attempts.push("native");
+    }
+
+    // Fallback: always try HLS.js once more if supported
+    if (Hls.isSupported() && !attempts.includes("hls")) {
+        attempts.push("hls");
+    }
+
+    // Final fallback: native video src
+    if (!attempts.includes("native")) {
+        attempts.push("native");
+    }
+
+    let attemptIndex = 0;
 
     const onLoaded = () => {
         updateUrlParams({ program: url });
         video.removeEventListener("error", onError);
     };
 
-    const onError = () => {
+    const onError = (err) => {
+        debugLog("Playback failed", attempts[attemptIndex], err?.message || err);
         video.removeEventListener("loadedmetadata", onLoaded);
-        setErrorIcon(li);
+        attemptIndex++;
+        if (attemptIndex < attempts.length) {
+            startAttempt();
+        } else {
+            setErrorIcon(li);
+        }
     };
 
-    video.addEventListener("loadedmetadata", onLoaded, { once: true });
-    video.addEventListener("error", onError, { once: true });
+    const startAttempt = () => {
+        resetPlayer();
 
-    if (isHls && Hls.isSupported()) {
-        hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) onError();
-        });
-    } else {
-        video.src = url;
-    }
+        const kind = attempts[attemptIndex];
+        debugLog("Attempting playback via", kind);
 
-    video.play().catch(onError);
+        video.addEventListener("loadedmetadata", onLoaded, { once: true });
+        video.addEventListener("error", onError, { once: true });
+
+        if (kind === "hls") {
+            if (!Hls.isSupported()) {
+                return onError(new Error("HLS not supported"));
+            }
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.ERROR, (event, data) => {
+                if (data.fatal) onError(new Error(data.details || "HLS fatal error"));
+            });
+        } else {
+            video.src = url;
+        }
+
+        video.play().catch(onError);
+    };
+
+    startAttempt();
 
     setPlayIcon(li);
     activeLi = li;
