@@ -293,7 +293,7 @@ function renderList(items) {
         const errorIcon = document.createElement("span");
         errorIcon.className = "errorIcon ml-1 hidden text-red-500";
         errorIcon.setAttribute("aria-label", "error");
-        errorIcon.textContent = "🚫";
+        errorIcon.textContent = getErrorIcon();
         btn.appendChild(errorIcon);
 
         li.title = item.group;
@@ -317,7 +317,7 @@ function showPlaceholder() {
     updateShareMenuState();
 }
 
-function play(url, li) {
+async function play(url, li) {
     debugLog("Playing", url);
     // Reset icons on previous active entry
     if (activeLi) {
@@ -400,6 +400,15 @@ function play(url, li) {
         video.play().catch(onError);
     };
 
+    const notFound = await isNotFound(url);
+    if (notFound) {
+        resetPlayer();
+        setErrorIcon(li, 404);
+        activeLi = li;
+        updateShareMenuState();
+        return;
+    }
+
     startAttempt();
 
     setPlayIcon(li);
@@ -413,10 +422,24 @@ function setPlayIcon(li) {
     li.querySelector(".playIcon").classList.remove("hidden");
 }
 
-function setErrorIcon(li) {
+function setErrorIcon(li, status) {
     if (!li) return;
     li.querySelector(".playIcon").classList.add("hidden");
-    li.querySelector(".errorIcon").classList.remove("hidden");
+    const errorIcon = li.querySelector(".errorIcon");
+    if (errorIcon) {
+        errorIcon.textContent = getErrorIcon(status);
+        errorIcon.classList.remove("hidden");
+    }
+}
+
+async function isNotFound(url) {
+    try {
+        const resp = await fetch(url, { method: "HEAD" });
+        return resp.status === 404;
+    } catch (err) {
+        debugLog("Skipping HEAD check", err?.message || err);
+        return false;
+    }
 }
 
 function resolveUrl(base, path) {
