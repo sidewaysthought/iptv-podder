@@ -1,4 +1,5 @@
 let hls = null;
+let dashPlayer = null;
 let activeLi = null;
 let currentPlaylist = null;
 
@@ -330,6 +331,10 @@ async function play(url, li) {
             hls.destroy();
             hls = null;
         }
+        if (dashPlayer) {
+            dashPlayer.reset();
+            dashPlayer = null;
+        }
         video.pause();
         video.removeAttribute("src");
         video.load();
@@ -338,12 +343,19 @@ async function play(url, li) {
 
     const attempts = [];
     const isHls = /\.m3u8($|\?)/i.test(url);
+    const isDash = /\.mpd($|\?)/i.test(url);
+    const hasDash = typeof dashjs !== "undefined";
 
     // Keep the existing detection-based attempt first
     if (isHls && Hls.isSupported()) {
         attempts.push("hls");
     } else {
         attempts.push("native");
+    }
+
+    // Try dash.js after HLS for additional coverage
+    if (hasDash && (isDash || attempts.includes("hls"))) {
+        attempts.push("dash");
     }
 
     // Fallback: always try HLS.js once more if supported
@@ -393,6 +405,19 @@ async function play(url, li) {
             hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) onError(new Error(data.details || "HLS fatal error"));
             });
+        } else if (kind === "dash") {
+            if (!hasDash) {
+                return onError(new Error("dash.js not available"));
+            }
+            dashPlayer = dashjs.MediaPlayer().create();
+            let dashErrored = false;
+            const handleDashError = (e) => {
+                if (dashErrored) return;
+                dashErrored = true;
+                onError(new Error(e?.event?.message || e?.message || "DASH fatal error"));
+            };
+            dashPlayer.on(dashjs.MediaPlayer.events.ERROR, handleDashError);
+            dashPlayer.initialize(video, url, true);
         } else {
             video.src = url;
         }
