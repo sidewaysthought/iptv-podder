@@ -14,5 +14,7 @@ if (empty($pageTitle)) {
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- hls.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <!-- dash.js -->
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
     <?php include 'partials/analytics.php'; ?>
 </head>
