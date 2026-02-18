@@ -102,10 +102,7 @@ if (historyBtn) {
         populateHistory();
         const hidden = historyMenu.classList.toggle("hidden");
         historyBtn.setAttribute("aria-expanded", String(!hidden));
-        if (!hidden) {
-            const firstItem = historyMenu.querySelector("button[role='menuitem']");
-            if (firstItem) firstItem.focus();
-        }
+        // Don't move focus on mouse/touch open; keep it predictable.
     });
 
     historyBtn.addEventListener("keydown", (e) => {
@@ -122,9 +119,11 @@ if (historyBtn) {
 
 function hideHistoryMenu() {
     if (historyMenu && !historyMenu.classList.contains("hidden")) {
+        const focusWasInside = historyMenu.contains(document.activeElement);
         historyMenu.classList.add("hidden");
         historyBtn.setAttribute("aria-expanded", "false");
-        historyBtn.focus();
+        // Avoid unexpected focus jumps. Only move focus if we'd otherwise leave it on a now-hidden element.
+        if (focusWasInside) historyBtn.focus();
     }
 }
 
@@ -227,10 +226,7 @@ shareBtn.addEventListener("click", () => {
   const hidden = shareMenu.classList.toggle("hidden");
   shareBtn.setAttribute("aria-expanded", String(!hidden));
   updateShareMenuState();
-  if (!hidden) {
-      const firstItem = shareMenu.querySelector("button[role='menuitem']:not([disabled])");
-      if (firstItem) firstItem.focus();
-  }
+  // Don't move focus on mouse/touch open; keep it predictable.
 });
 
 shareBtn.addEventListener("keydown", (e) => {
@@ -247,9 +243,11 @@ shareBtn.addEventListener("keydown", (e) => {
 function hideShareMenu() {
   if (shareMenu && !shareMenu.classList.contains("hidden")) {
       debugLog("Hiding share menu");
+      const focusWasInside = shareMenu.contains(document.activeElement);
       shareMenu.classList.add("hidden");
       shareBtn.setAttribute("aria-expanded", "false");
-      shareBtn.focus();
+      // Avoid unexpected focus jumps. Only move focus if we'd otherwise leave it on a now-hidden element.
+      if (focusWasInside) shareBtn.focus();
   }
 }
 
@@ -626,9 +624,11 @@ document.addEventListener("DOMContentLoaded", () => {
 function hideShareMenu() {
   if (shareMenu && !shareMenu.classList.contains("hidden")) {
       debugLog("Hiding share menu");
+      const focusWasInside = shareMenu.contains(document.activeElement);
       shareMenu.classList.add("hidden");
       shareBtn.setAttribute("aria-expanded", "false");
-      shareBtn.focus();
+      // Avoid unexpected focus jumps. Only move focus if we'd otherwise leave it on a now-hidden element.
+      if (focusWasInside) shareBtn.focus();
   }
 }
 
