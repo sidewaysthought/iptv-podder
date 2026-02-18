@@ -1,11 +1,15 @@
-(function(global) {
-  function getErrorIcon(status) {
-    return status === 404 ? "⛓️‍💥" : "🚫";
-  }
+// error-icons.js
+// Browser global + ESM export so vitest can import it cleanly.
 
-  global.getErrorIcon = getErrorIcon;
+export function getErrorIcon(status) {
+  return status === 404 ? "⛓️‍💥" : "🚫";
+}
 
-  if (typeof module !== "undefined" && module.exports) {
-    module.exports = { getErrorIcon };
-  }
-})(typeof window !== "undefined" ? window : globalThis);
+if (typeof window !== "undefined") {
+  window.getErrorIcon = getErrorIcon;
+}
+
+// Optional CommonJS compatibility
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { getErrorIcon };
+}

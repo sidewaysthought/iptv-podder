@@ -1,5 +1,5 @@
-const { describe, it, expect } = require("vitest");
-const { getErrorIcon } = require("./error-icons");
+import { describe, it, expect } from "vitest";
+import { getErrorIcon } from "./error-icons.js";
 
 describe("getErrorIcon", () => {
   it("returns chain break for 404", () => {
