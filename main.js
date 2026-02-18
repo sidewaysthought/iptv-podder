@@ -21,6 +21,7 @@ const historyMenu = document.getElementById("historyMenu");
 const streamList = document.getElementById("streamList");
 const searchWrap = document.getElementById("searchWrap");
 const searchInput = document.getElementById("searchInput");
+const srStatus = document.getElementById("srStatus");
 const video = document.getElementById("videoPlayer");
 const playlistContainer = document.getElementById("playlistContainer");
 const playerWrapper = document.getElementById("playerWrapper");
@@ -56,23 +57,33 @@ function populateHistory() {
             const span = document.createElement("span");
             span.textContent = "No history";
             span.className = "block px-2 py-1 text-gray-500";
+            span.role = "none";
             historyMenu.appendChild(span);
         } else {
             history.forEach((u) => {
                 const btn = document.createElement("button");
                 btn.type = "button";
-                btn.className = "block w-full text-left px-2 py-1 hover:bg-gray-100";
+                btn.role = "menuitem";
+                btn.className = "block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring";
                 btn.textContent = u;
                 btn.addEventListener("click", () => {
                     manifestInput.value = u;
-                    historyMenu.classList.add("hidden");
-                    historyBtn.setAttribute("aria-expanded", "false");
+                    hideHistoryMenu();
                     manifestInput.focus();
                 });
                 historyMenu.appendChild(btn);
             });
         }
     }
+}
+
+function announce(msg) {
+    if (!srStatus) return;
+    // Clear then set (helps some screen readers re-announce)
+    srStatus.textContent = "";
+    window.setTimeout(() => {
+        srStatus.textContent = msg;
+    }, 10);
 }
 
 function addToHistory(url) {
@@ -91,15 +102,100 @@ if (historyBtn) {
         populateHistory();
         const hidden = historyMenu.classList.toggle("hidden");
         historyBtn.setAttribute("aria-expanded", String(!hidden));
+        if (!hidden) {
+            const firstItem = historyMenu.querySelector("button[role='menuitem']");
+            if (firstItem) firstItem.focus();
+        }
+    });
+
+    historyBtn.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            populateHistory();
+            historyMenu.classList.remove("hidden");
+            historyBtn.setAttribute("aria-expanded", "true");
+            const firstItem = historyMenu.querySelector("button[role='menuitem']");
+            if (firstItem) firstItem.focus();
+        }
     });
 }
+
+function hideHistoryMenu() {
+    if (historyMenu && !historyMenu.classList.contains("hidden")) {
+        historyMenu.classList.add("hidden");
+        historyBtn.setAttribute("aria-expanded", "false");
+        historyBtn.focus();
+    }
+}
+
 document.addEventListener("click", (e) => {
     if (historyBtn && historyMenu &&
         !historyBtn.contains(e.target) && !historyMenu.contains(e.target)) {
-        historyMenu.classList.add("hidden");
-        historyBtn.setAttribute("aria-expanded", "false");
+        if (!historyMenu.classList.contains("hidden")) {
+            historyMenu.classList.add("hidden");
+            historyBtn.setAttribute("aria-expanded", "false");
+        }
+    }
+    if (shareBtn && shareMenu && !shareBtn.contains(e.target) && !shareMenu.contains(e.target)) {
+        hideShareMenu();
     }
 });
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        hideHistoryMenu();
+        hideShareMenu();
+    }
+});
+
+function focusNextMenuItem(menu, direction) {
+    const items = [...menu.querySelectorAll("button[role='menuitem']:not([disabled])")];
+    if (!items.length) return;
+
+    const idx = items.indexOf(document.activeElement);
+    const nextIdx = idx === -1
+        ? 0
+        : (idx + direction + items.length) % items.length;
+    items[nextIdx].focus();
+}
+
+function menuKeydownHandler(e, menu, hideFn) {
+    if (menu.classList.contains("hidden")) return;
+
+    switch (e.key) {
+        case "ArrowDown":
+            e.preventDefault();
+            focusNextMenuItem(menu, +1);
+            break;
+        case "ArrowUp":
+            e.preventDefault();
+            focusNextMenuItem(menu, -1);
+            break;
+        case "Home": {
+            e.preventDefault();
+            const first = menu.querySelector("button[role='menuitem']:not([disabled])");
+            if (first) first.focus();
+            break;
+        }
+        case "End": {
+            e.preventDefault();
+            const items = [...menu.querySelectorAll("button[role='menuitem']:not([disabled])")];
+            if (items.length) items.at(-1).focus();
+            break;
+        }
+        case "Escape":
+            e.preventDefault();
+            hideFn();
+            break;
+    }
+}
+
+if (historyMenu) {
+    historyMenu.addEventListener("keydown", (e) => menuKeydownHandler(e, historyMenu, hideHistoryMenu));
+}
+if (shareMenu) {
+    shareMenu.addEventListener("keydown", (e) => menuKeydownHandler(e, shareMenu, hideShareMenu));
+}
 
 function adjustPlaylistHeight() {
     if (!playlistContainer || !playerWrapper) return;
@@ -131,13 +227,31 @@ shareBtn.addEventListener("click", () => {
   const hidden = shareMenu.classList.toggle("hidden");
   shareBtn.setAttribute("aria-expanded", String(!hidden));
   updateShareMenuState();
-});
-
-document.addEventListener("click", (e) => {
-  if (!shareBtn.contains(e.target) && !shareMenu.contains(e.target)) {
-    hideShareMenu();
+  if (!hidden) {
+      const firstItem = shareMenu.querySelector("button[role='menuitem']:not([disabled])");
+      if (firstItem) firstItem.focus();
   }
 });
+
+shareBtn.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      shareMenu.classList.remove("hidden");
+      shareBtn.setAttribute("aria-expanded", "true");
+      updateShareMenuState();
+      const firstItem = shareMenu.querySelector("button[role='menuitem']:not([disabled])");
+      if (firstItem) firstItem.focus();
+  }
+});
+
+function hideShareMenu() {
+  if (shareMenu && !shareMenu.classList.contains("hidden")) {
+      debugLog("Hiding share menu");
+      shareMenu.classList.add("hidden");
+      shareBtn.setAttribute("aria-expanded", "false");
+      shareBtn.focus();
+  }
+}
 
 sharePlaylistBtn.addEventListener("click", () => {
   if (sharePlaylistBtn.disabled) return;
@@ -173,6 +287,7 @@ async function fetchAndRender() {
     if (!url) return alert("Enter a playlist URL.");
 
     debugLog("Fetching playlist", url);
+    announce("Loading playlist...");
 
     try {
         const text = await fetchWithProxy(url);
@@ -183,10 +298,16 @@ async function fetchAndRender() {
         updateUrlParams({ playlist: url, program: null });
         currentPlaylist = items.length ? url : null;
         updateShareMenuState();
-        if (items.length) addToHistory(url);
+        if (items.length) {
+            addToHistory(url);
+            announce(`Loaded ${items.length} channels.`);
+        } else {
+            announce("Playlist is empty.");
+        }
     } catch (err) {
         console.error(err);
         debugLog("Fetch failed", err.message);
+        announce("Failed to load playlist.");
         alert(`Failed: ${err.message}. Server must allow CORS or try the proxy.`);
     }
 }
@@ -299,12 +420,6 @@ function renderList(items) {
 
         li.title = item.group;
         btn.addEventListener("click", () => play(item.uri, li));
-        btn.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                play(item.uri, li);
-            }
-        });
 
         li.appendChild(btn);
         streamList.appendChild(li);
@@ -373,6 +488,7 @@ async function play(url, li) {
     const onLoaded = () => {
         updateUrlParams({ program: url });
         video.removeEventListener("error", onError);
+        announce(`Playing: ${li?.dataset.label || 'Stream'}`);
     };
 
     const onError = (err) => {
@@ -383,6 +499,7 @@ async function play(url, li) {
             startAttempt();
         } else {
             setErrorIcon(li);
+            announce(`Playback error: ${li?.dataset.label || 'Stream'}`);
         }
     };
 
@@ -507,9 +624,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function hideShareMenu() {
-  debugLog("Hiding share menu");
-  shareMenu.classList.add("hidden");
-  shareBtn.setAttribute("aria-expanded", "false");
+  if (shareMenu && !shareMenu.classList.contains("hidden")) {
+      debugLog("Hiding share menu");
+      shareMenu.classList.add("hidden");
+      shareBtn.setAttribute("aria-expanded", "false");
+      shareBtn.focus();
+  }
 }
 
 function updateShareMenuState() {
