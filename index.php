@@ -28,21 +28,21 @@ $pageTitle = 'View IPTV';
             <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
                 class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
             <datalist id="history"></datalist>
-            <button id="loadBtn" class="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
+            <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
                 Load
             </button>
             <div class="relative flex items-center">
-                <button id="historyBtn" aria-haspopup="true" aria-expanded="false" class="px-2 text-blue-600">
+                <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                         <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <span class="sr-only">History</span>
                 </button>
-                <div id="historyMenu" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden"></div>
+                <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden"></div>
             </div>
             <div class="relative flex items-center">
-                <button id="shareBtn" aria-haspopup="true" aria-expanded="false" class="px-2 text-blue-600">
+                <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                         <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
@@ -50,9 +50,9 @@ $pageTitle = 'View IPTV';
                     </svg>
                     <span class="sr-only">Share</span>
                 </button>
-                <div id="shareMenu" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden">
-                    <button id="sharePlaylistBtn" class="block w-full text-left px-2 py-1 hover:bg-gray-100 disabled:opacity-50" disabled>Share playlist</button>
-                    <button id="shareVideoBtn" class="block w-full text-left px-2 py-1 hover:bg-gray-100 disabled:opacity-50" disabled>Share playlist &amp; video</button>
+                <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden">
+                    <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50" disabled>Share playlist</button>
+                    <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50" disabled>Share playlist &amp; video</button>
                 </div>
             </div>
         </div>
@@ -64,6 +64,7 @@ $pageTitle = 'View IPTV';
                 class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm overflow-hidden bg-white">
                 <!-- Search -->
                 <div id="searchWrap" class="hidden p-2 border-b border-gray-200">
+                    <label for="searchInput" class="sr-only">Filter channels</label>
                     <input id="searchInput" type="text" placeholder="Filter channels..."
                         class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
                 </div>
@@ -88,6 +89,10 @@ $pageTitle = 'View IPTV';
         </div>
     </main>
     <?php include 'partials/footer.php'; ?>
+
+    <!-- Screen reader announcements for dynamic updates -->
+    <div id="srStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
     <script src="error-icons.js"></script>
     <script src="main.js"></script>
 </body>
