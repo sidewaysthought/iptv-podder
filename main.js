@@ -1,6 +1,40 @@
 import { getErrorIcon } from "./error-icons.js";
 
 let hls = null;
+
+function proxifyUrl(url) {
+  return `proxy.php?url=${encodeURIComponent(url)}`;
+}
+
+// Hls.js loader that routes all manifest/segment/key requests through the PHP proxy.
+// This is necessary for providers that set restrictive CORS headers (e.g. Pluto).
+class ProxyLoader extends Hls.DefaultConfig.loader {
+  load(context, config, callbacks) {
+    const origUrl = context.url;
+    const nextContext = { ...context, url: proxifyUrl(origUrl) };
+
+    const wrappedCallbacks = {
+      ...callbacks,
+      onSuccess: (response, stats, ctx, networkDetails) => {
+        // Make hls.js treat the response as if it came from the original URL.
+        // This preserves base URL resolution for relative URIs in playlists.
+        if (response && typeof response === 'object') {
+          response.url = origUrl;
+        }
+        callbacks.onSuccess(response, stats, { ...ctx, url: origUrl }, networkDetails);
+      },
+      onError: (error, ctx, networkDetails) => {
+        callbacks.onError(error, { ...ctx, url: origUrl }, networkDetails);
+      },
+      onTimeout: (stats, ctx, networkDetails) => {
+        callbacks.onTimeout(stats, { ...ctx, url: origUrl }, networkDetails);
+      },
+    };
+
+    return super.load(nextContext, config, wrappedCallbacks);
+  }
+}
+
 let dashPlayer = null;
 let activeLi = null;
 let currentPlaylist = null;
@@ -516,7 +550,9 @@ async function play(url, li) {
             if (!Hls.isSupported()) {
                 return onError(new Error("HLS not supported"));
             }
-            hls = new Hls();
+            hls = new Hls({
+                loader: ProxyLoader,
+            });
             hls.loadSource(url);
             hls.attachMedia(video);
             hls.on(Hls.Events.ERROR, (event, data) => {
@@ -575,11 +611,15 @@ function setErrorIcon(li, status) {
 }
 
 async function isNotFound(url) {
+    // Some HLS providers reject HEAD (405). Use a minimal GET instead.
     try {
-        const resp = await fetch(url, { method: "HEAD" });
+        const resp = await fetch(url, {
+            method: "GET",
+            headers: { Range: "bytes=0-0" },
+        });
         return resp.status === 404;
     } catch (err) {
-        debugLog("Skipping HEAD check", err?.message || err);
+        debugLog("Skipping not-found check", err?.message || err);
         return false;
     }
 }
