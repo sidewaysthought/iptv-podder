@@ -551,7 +551,15 @@ async function play(url, li) {
                 return onError(new Error("HLS not supported"));
             }
             hls = new Hls({
+                // hls.js uses different loaders for playlist vs fragments in some versions.
+                // Set all of them to ensure *everything* goes through the PHP proxy.
                 loader: ProxyLoader,
+                pLoader: ProxyLoader,
+                fLoader: ProxyLoader,
+                xhrSetup: (xhr /*, url */) => {
+                    // Avoid sending referrer; keep it simple and reduce cross-site weirdness.
+                    try { xhr.withCredentials = false; } catch {}
+                },
             });
             hls.loadSource(url);
             hls.attachMedia(video);
@@ -578,15 +586,7 @@ async function play(url, li) {
         video.play().catch(onError);
     };
 
-    const notFound = await isNotFound(url);
-    if (notFound) {
-        resetPlayer();
-        setErrorIcon(li, 404);
-        activeLi = li;
-        updateShareMenuState();
-        return;
-    }
-
+    // Skip preflight existence checks: they trigger CORS errors on many providers.
     startAttempt();
 
     setPlayIcon(li);
@@ -607,20 +607,6 @@ function setErrorIcon(li, status) {
     if (errorIcon) {
         errorIcon.textContent = getErrorIcon(status);
         errorIcon.classList.remove("hidden");
-    }
-}
-
-async function isNotFound(url) {
-    // Some HLS providers reject HEAD (405). Use a minimal GET instead.
-    try {
-        const resp = await fetch(url, {
-            method: "GET",
-            headers: { Range: "bytes=0-0" },
-        });
-        return resp.status === 404;
-    } catch (err) {
-        debugLog("Skipping not-found check", err?.message || err);
-        return false;
     }
 }
 
