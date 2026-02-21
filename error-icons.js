@@ -1,15 +1,7 @@
 // error-icons.js
-// Browser global + ESM export so vitest can import it cleanly.
+// ESM module (used by main.js and vitest)
 
 export function getErrorIcon(status) {
-  return status === 404 ? "⛓️‍💥" : "🚫";
-}
-
-if (typeof window !== "undefined") {
-  window.getErrorIcon = getErrorIcon;
-}
-
-// Optional CommonJS compatibility
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = { getErrorIcon };
+  // Keep this exact sequence in sync with error-icons.test.js
+  return status === 404 ? "⛓️💥" : "🚫";
 }

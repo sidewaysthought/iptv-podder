@@ -1,3 +1,5 @@
+import { getErrorIcon } from "./error-icons.js";
+
 let hls = null;
 let dashPlayer = null;
 let activeLi = null;
