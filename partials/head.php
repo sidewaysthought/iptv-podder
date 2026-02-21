@@ -61,15 +61,8 @@ if (empty($pageTitle)) {
       })();
     </script>
 
-    <!-- Tailwind CSS
-         IMPORTANT: we use class-based dark mode (html.dark) so user overrides work.
-         With the CDN build, set this before loading tailwindcss.com. -->
-    <script>
-      window.tailwind = window.tailwind || {};
-      window.tailwind.config = window.tailwind.config || {};
-      window.tailwind.config.darkMode = 'class';
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (built locally; pinned version; supports darkMode='class') -->
+    <link rel="stylesheet" href="assets/tailwind.css" />
     <!-- hls.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <!-- dash.js -->
