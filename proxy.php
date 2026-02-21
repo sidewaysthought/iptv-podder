@@ -17,13 +17,17 @@ define('MAX_CACHE_BYTES', 3670016); // 3.5 MB
 // Max size for streamed binary responses (segments/keys). Tune as needed.
 define('MAX_STREAM_BYTES', 52428800); // 50 MB
 
-// Rate limit: playlists are low-volume; HLS playback is high-volume (segments).
-// Keep a conservative limit for playlists, and a higher one for segment/asset streaming.
-define('RATE_LIMIT_PLAYLIST', 60); // requests
-define('RATE_WINDOW_PLAYLIST', 3600); // per hour
+// Rate limit: playlists are low-volume; HLS playback is high-volume and bursty (segments).
+// Use a token-bucket limiter (burst + steady refill) instead of a simple per-hour counter.
+//
+// Playlist: allow small bursts; refill slowly.
+// Stream: allow big bursts for startup/channel flips; refill at a few req/sec.
 
-define('RATE_LIMIT_STREAM', 2400); // requests
-define('RATE_WINDOW_STREAM', 3600); // per hour
+define('RATE_PLAYLIST_CAPACITY', 30);           // max burst tokens
+define('RATE_PLAYLIST_REFILL_PER_SEC', 0.5);   // 30/min
+
+define('RATE_STREAM_CAPACITY', 500);           // max burst tokens
+define('RATE_STREAM_REFILL_PER_SEC', 4.0);     // 240/min
 
 define('RATE_DIR', sys_get_temp_dir() . '/proxy_rate');
 
@@ -45,42 +49,63 @@ function rate_limit($bucket = 'playlist') {
         mkdir($dir, 0700, true);
     }
 
-    $limit = ($bucket === 'stream') ? RATE_LIMIT_STREAM : RATE_LIMIT_PLAYLIST;
-    $window = ($bucket === 'stream') ? RATE_WINDOW_STREAM : RATE_WINDOW_PLAYLIST;
+    $capacity = ($bucket === 'stream') ? RATE_STREAM_CAPACITY : RATE_PLAYLIST_CAPACITY;
+    $refillPerSec = ($bucket === 'stream') ? RATE_STREAM_REFILL_PER_SEC : RATE_PLAYLIST_REFILL_PER_SEC;
 
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $file = $dir . '/' . sha1($bucket . ':' . $ip);
-    $now = time();
+    $sid = session_id() ?: 'nosid';
 
-    $entries = [];
+    // Scope to session + IP so the proxy remains "UI-only" and one user can't starve the whole site.
+    $file = $dir . '/' . sha1($bucket . ':' . $ip . ':' . $sid) . '.json';
+
+    $now = microtime(true);
+
+    $state = [
+        'tokens' => $capacity,
+        'ts' => $now,
+    ];
+
     if (file_exists($file)) {
-        $json = file_get_contents($file);
-        $entries = json_decode($json, true) ?: [];
+        $json = @file_get_contents($file);
+        $decoded = json_decode($json, true);
+        if (is_array($decoded) && isset($decoded['tokens']) && isset($decoded['ts'])) {
+            $state = $decoded;
+        }
     }
 
-    $entries = array_values(array_filter($entries, fn($t) => $t + $window > $now));
+    $elapsed = max(0.0, $now - (float)$state['ts']);
+    $tokens = min($capacity, (float)$state['tokens'] + ($elapsed * $refillPerSec));
 
-    if (count($entries) >= $limit) {
+    if ($tokens < 1.0) {
         http_response_code(429);
+        header('Retry-After: 1');
         echo 'Too many requests';
         exit;
     }
 
-    $entries[] = $now;
-    file_put_contents($file, json_encode($entries));
+    // Spend one token
+    $tokens -= 1.0;
 
-    // Cleanup old files (best-effort)
-    foreach (glob($dir . '/*') as $f) {
-        $data = json_decode(@file_get_contents($f), true);
-        if (!is_array($data)) {
-            @unlink($f);
-            continue;
-        }
-        $data = array_values(array_filter($data, fn($t) => $t + $window > $now));
-        if (empty($data)) {
-            @unlink($f);
-        } else {
-            file_put_contents($f, json_encode($data));
+    $state = [
+        'tokens' => $tokens,
+        'ts' => $now,
+    ];
+
+    @file_put_contents($file, json_encode($state));
+
+    // Best-effort cleanup: occasionally prune stale files.
+    // Keep this cheap; don't glob on every request.
+    if (mt_rand(1, 500) === 1) {
+        foreach (glob($dir . '/*.json') as $f) {
+            $st = json_decode(@file_get_contents($f), true);
+            if (!is_array($st) || !isset($st['ts'])) {
+                @unlink($f);
+                continue;
+            }
+            // If untouched for 6 hours, delete.
+            if ($now - (float)$st['ts'] > 21600) {
+                @unlink($f);
+            }
         }
     }
 }
