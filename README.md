@@ -9,3 +9,5 @@ A lightweight IPTV/HLS stream explorer and player.
 - The PHP proxy limits each response to 3.5 MB, rate limits clients by IP and
   periodically cleans its cache.
 - The proxy validates IPv4 and IPv6 addresses to support modern DNS records.
+- Proxy auth:
+  - The proxy is intended to be usable only from the site UI and requires a browser session.
