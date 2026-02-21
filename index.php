@@ -16,7 +16,7 @@ $pageTitle = 'View IPTV';
         <!-- Header -->
         <header class="mb-4">
             <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
-            <p class="text-gray-600">
+            <p class="text-gray-600 dark:text-gray-300">
                 Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
                 streams and play them on click.
             </p>
@@ -32,17 +32,17 @@ $pageTitle = 'View IPTV';
                 Load
             </button>
             <div class="relative flex items-center">
-                <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded">
+                <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                         <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <span class="sr-only">History</span>
                 </button>
-                <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden"></div>
+                <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden dark:bg-gray-900 dark:border-gray-700"></div>
             </div>
             <div class="relative flex items-center">
-                <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded">
+                <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                         <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
                         <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
@@ -50,9 +50,9 @@ $pageTitle = 'View IPTV';
                     </svg>
                     <span class="sr-only">Share</span>
                 </button>
-                <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden">
-                    <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50" disabled>Share playlist</button>
-                    <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50" disabled>Share playlist &amp; video</button>
+                <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 mt-2 w-48 bg-white border rounded shadow hidden dark:bg-gray-900 dark:border-gray-700">
+                    <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist</button>
+                    <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist &amp; video</button>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@ $pageTitle = 'View IPTV';
 
                 <!-- Streams list -->
                 <div id="listWrapper" class="flex-1 overflow-y-auto">
-                    <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3"></ul>
+                    <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3 dark:text-blue-300"></ul>
                 </div>
                 <div class="border-t text-xs text-gray-800 p-2" aria-label="Stream status legend">
                     <p class="font-semibold">Status legend</p>
