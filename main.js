@@ -456,27 +456,32 @@ function renderList(items) {
 
         const pendingIcon = document.createElement("span");
         pendingIcon.className = "pendingIcon ml-1 hidden";
-        pendingIcon.setAttribute("aria-label", "loading");
+        pendingIcon.setAttribute("aria-hidden", "true");
         pendingIcon.textContent = "⏳";
         btn.appendChild(pendingIcon);
 
         const playIcon = document.createElement("span");
         playIcon.className = "playIcon ml-1 hidden";
-        playIcon.setAttribute("aria-label", "playing");
+        playIcon.setAttribute("aria-hidden", "true");
         playIcon.textContent = "▶";
         btn.appendChild(playIcon);
 
         const okIcon = document.createElement("span");
-        okIcon.className = "okIcon ml-1 hidden text-green-600";
-        okIcon.setAttribute("aria-label", "works");
+        okIcon.className = "okIcon ml-1 hidden text-green-700";
+        okIcon.setAttribute("aria-hidden", "true");
         okIcon.textContent = "✓";
         btn.appendChild(okIcon);
 
         const errorIcon = document.createElement("span");
-        errorIcon.className = "errorIcon ml-1 hidden text-red-500";
-        errorIcon.setAttribute("aria-label", "failed");
+        errorIcon.className = "errorIcon ml-1 hidden text-red-600";
+        errorIcon.setAttribute("aria-hidden", "true");
         errorIcon.textContent = "✕";
         btn.appendChild(errorIcon);
+
+        const statusText = document.createElement("span");
+        statusText.className = "statusText sr-only";
+        statusText.textContent = "";
+        btn.appendChild(statusText);
 
         li.title = item.group;
 
@@ -518,6 +523,25 @@ function setStreamStatus(li, status) {
         li.querySelector(".okIcon")?.classList.remove("hidden");
     } else if (status === "failed") {
         li.querySelector(".errorIcon")?.classList.remove("hidden");
+    }
+
+    // Accessibility: keep a text equivalent attached to the button so icons aren't the only signal.
+    const statusTextEl = li.querySelector(".statusText");
+    if (statusTextEl) {
+        const label = li.dataset.label || "Stream";
+        const readable =
+            status === "pending" ? "Loading" :
+            status === "playing" ? "Playing" :
+            status === "ok" ? "Works" :
+            status === "failed" ? "Failed" :
+            "";
+        statusTextEl.textContent = readable ? ` — ${readable}` : "";
+
+        // Make the button's accessible name include the status.
+        const btn = li.querySelector("button");
+        if (btn) {
+            btn.setAttribute("aria-label", readable ? `${label} — ${readable}` : label);
+        }
     }
 
     const uri = li.dataset.uri;
