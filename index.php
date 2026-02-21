@@ -61,7 +61,7 @@ $pageTitle = 'View IPTV';
         </div>
 
         <!-- Two‑column layout -->
-        <div class="flex flex-col lg:flex-row gap-4 mt-6">
+        <div class="flex flex-col lg:flex-row gap-4 mt-6 min-h-0">
             <!-- Sidebar: search + list -->
             <aside id="playlistContainer"
                 class="lg:w-1/3 w-full flex flex-col min-h-0 border border-gray-300 rounded shadow-sm overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-700 max-h-[70vh] lg:max-h-[calc(100vh-14rem)]">
@@ -73,8 +73,12 @@ $pageTitle = 'View IPTV';
                 </div>
 
                 <!-- Streams list -->
-                <div id="listWrapper" class="flex-1 min-h-0 overflow-y-auto">
-                    <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3 dark:text-blue-300"></ul>
+                <div id="listWrapper" class="flex-1 min-h-0">
+                    <ul
+                      id="streamList"
+                      class="space-y-1 text-blue-700 p-2 pr-3 dark:text-blue-300 overflow-y-auto min-h-0"
+                      style="max-height: 70vh;"
+                    ></ul>
                 </div>
                 <div class="border-t text-xs text-gray-800 p-2 dark:text-gray-100" aria-label="Stream status legend">
                     <p class="font-semibold">Status legend</p>
