@@ -6,13 +6,13 @@ $pageTitle = 'View IPTV';
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
-<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="min-h-screen flex flex-col bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
     </nav>
     <?php include 'partials/header.php'; ?>
-    <main class="container mx-auto p-6 max-w-6xl">
+    <main class="container mx-auto p-6 max-w-6xl flex-1">
         <!-- Header -->
         <header class="mb-4">
             <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
