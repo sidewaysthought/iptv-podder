@@ -6,7 +6,8 @@ $pageTitle = 'View IPTV';
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
-<body class="min-h-screen flex flex-col bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div class="min-h-screen flex flex-col">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
@@ -98,5 +99,6 @@ $pageTitle = 'View IPTV';
     <div id="srStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <script type="module" src="main.js"></script>
+    </div>
 </body>
 </html>
