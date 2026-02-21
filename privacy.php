@@ -5,12 +5,12 @@ $pageTitle = 'Privacy Policy';
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
-<body class="min-h-screen bg-gray-100 text-gray-900">
+<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#policy" class="block">Skip to content</a>
     </nav>
     <?php include 'partials/header.php'; ?>
-    <main id="policy" tabindex="-1" class="container mx-auto p-6 max-w-5xl space-y-6">
+    <main id="policy" tabindex="-1" class="container mx-auto p-6 max-w-5xl space-y-6 text-gray-900 dark:text-gray-100">
         <header class="space-y-2">
             <h1 class="text-3xl font-bold">Privacy Policy</h1>
             <p>Effective as of May 16, 2025</p>
