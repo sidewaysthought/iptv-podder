@@ -105,7 +105,7 @@ function populateHistory() {
         if (!history.length) {
             const span = document.createElement("span");
             span.textContent = "No history";
-            span.className = "block px-2 py-1 text-gray-500";
+            span.className = "block px-2 py-1 text-gray-500 dark:text-gray-400";
             span.role = "none";
             historyMenu.appendChild(span);
         } else {
@@ -113,7 +113,7 @@ function populateHistory() {
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.role = "menuitem";
-                btn.className = "block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring";
+                btn.className = "block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800 break-all";
                 btn.textContent = u;
                 btn.addEventListener("click", () => {
                     manifestInput.value = u;
