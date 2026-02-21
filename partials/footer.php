@@ -1,7 +1,11 @@
-<footer class="bg-gray-200 text-center py-4 mt-8">
-    <p class="font-semibold">View-IPTV.stream</p>
-    <p>Copyright &copy; 2025 Sideways Thought LLC.</p>
-    <p><a href="index.php" class="text-blue-600 hover:underline">Home</a> | <a href="privacy.php" class="text-blue-600 hover:underline">Privacy Policy</a></p>
+<footer class="bg-gray-200 text-center py-4 mt-8 dark:bg-gray-900">
+    <p class="font-semibold text-gray-900 dark:text-gray-100">View-IPTV.stream</p>
+    <p class="text-gray-900 dark:text-gray-100">Copyright &copy; 2025 Sideways Thought LLC.</p>
+    <p>
+      <a href="index.php" class="text-blue-700 hover:underline dark:text-blue-300">Home</a>
+      |
+      <a href="privacy.php" class="text-blue-700 hover:underline dark:text-blue-300">Privacy Policy</a>
+    </p>
 </footer>
 
 <?php include 'partials/consent.php'; ?>

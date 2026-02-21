@@ -6,7 +6,7 @@ $pageTitle = 'View IPTV';
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
-<body class="min-h-screen bg-gray-100 text-gray-900">
+<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
@@ -26,7 +26,7 @@ $pageTitle = 'View IPTV';
         <div id="playlistForm" tabindex="-1" class="flex flex-col sm:flex-row gap-2 mt-4">
             <label for="manifestUrl" class="sr-only">Playlist URL</label>
             <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
-                class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
+                class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
             <datalist id="history"></datalist>
             <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
                 Load
@@ -61,12 +61,12 @@ $pageTitle = 'View IPTV';
         <div class="flex flex-col lg:flex-row gap-4 mt-6">
             <!-- Sidebar: search + list -->
             <aside id="playlistContainer"
-                class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm overflow-hidden bg-white">
+                class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-700">
                 <!-- Search -->
                 <div id="searchWrap" class="hidden p-2 border-b border-gray-200">
                     <label for="searchInput" class="sr-only">Filter channels</label>
                     <input id="searchInput" type="text" placeholder="Filter channels..."
-                        class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring" />
+                        class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
                 </div>
 
                 <!-- Streams list -->
