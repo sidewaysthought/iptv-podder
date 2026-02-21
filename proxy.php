@@ -1,8 +1,28 @@
 <?php
 session_start();
-if (empty($_SESSION['user_active'])) {
+
+// Authentication
+// - Browser use: a session is set by index.php
+// - Non-browser / programmatic use: set PROXY_TOKEN in the environment and pass ?token=... to proxy.php
+function proxy_expected_token() {
+    $t = getenv('PROXY_TOKEN');
+    return is_string($t) ? $t : '';
+}
+
+function proxy_has_valid_token() {
+    $expected = proxy_expected_token();
+    if ($expected === '') {
+        return false;
+    }
+    $token = $_GET['token'] ?? '';
+    return is_string($token) && hash_equals($expected, $token);
+}
+
+$session_ok = !empty($_SESSION['user_active']);
+$token_ok = proxy_has_valid_token();
+if (!$session_ok && !$token_ok) {
     http_response_code(403);
-    echo 'Session required';
+    echo 'Session or token required';
     exit;
 }
 
@@ -87,41 +107,33 @@ function public_ip_addresses($host) {
 
 cleanup_cache();
 
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: *');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo 'Method Not Allowed';
     exit;
 }
 
-// ensure requests come over HTTPS/443
-if ((empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') && ($_SERVER['SERVER_PORT'] ?? 0) != 443) {
+// Ensure the proxy endpoint itself is only served over HTTPS in production.
+// Respect reverse proxies (e.g. Cloudflare/Nginx) via X-Forwarded-Proto.
+$https_on = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['SERVER_PORT'] ?? 0) == 443)
+    || (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+if (!$https_on) {
     http_response_code(403);
     echo 'HTTPS required';
     exit;
 }
 
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$referer = $_SERVER['HTTP_REFERER'] ?? '';
-$host = $_SERVER['HTTP_HOST'];
-
-function same_host($url, $host) {
-    $h = parse_url($url, PHP_URL_HOST);
-    return $h === $host;
-}
-
-$allowed = false;
-if ($origin && same_host($origin, $host)) {
-    header("Access-Control-Allow-Origin: $origin");
-    $allowed = true;
-} elseif ($referer && same_host($referer, $host)) {
-    $allowed = true;
-}
-
-if (!$allowed) {
-    http_response_code(403);
-    echo "Forbidden";
-    exit;
-}
+// We are intentionally a CORS-bypass proxy for playlist fetches.
+// Auth is enforced via session or PROXY_TOKEN; allow cross-origin reads.
+header('Access-Control-Allow-Origin: *');
 
 rate_limit();
 
@@ -133,16 +145,10 @@ if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
 }
 
 $parts = parse_url($url);
-if (($parts['scheme'] ?? '') !== 'https') {
+$scheme = strtolower($parts['scheme'] ?? '');
+if (!in_array($scheme, ['http', 'https'], true)) {
     http_response_code(400);
     echo "Invalid scheme";
-    exit;
-}
-
-$path = strtolower($parts['path'] ?? '');
-if (!preg_match('/\.m3u8?$/', $path)) {
-    http_response_code(400);
-    echo 'Invalid playlist extension';
     exit;
 }
 
