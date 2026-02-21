@@ -7,13 +7,15 @@ $pageTitle = 'View IPTV';
 <html lang="en">
 <?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-    <div class="min-h-screen grid grid-rows-[auto_1fr_auto]">
+    <div class="min-h-screen flex flex-col">
+    <header>
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
     </nav>
     <?php include 'partials/header.php'; ?>
-    <main class="container mx-auto p-6 max-w-6xl">
+    </header>
+    <main class="container mx-auto p-6 max-w-6xl flex-1">
         <!-- Header -->
         <header class="mb-4">
             <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
@@ -93,12 +95,13 @@ $pageTitle = 'View IPTV';
             </section>
         </div>
     </main>
-    <?php include 'partials/footer.php'; ?>
 
     <!-- Screen reader announcements for dynamic updates -->
     <div id="srStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-    <script type="module" src="main.js"></script>
+    <?php include 'partials/footer.php'; ?>
     </div>
+
+    <script type="module" src="main.js"></script>
 </body>
 </html>

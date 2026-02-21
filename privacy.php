@@ -6,12 +6,14 @@ $pageTitle = 'Privacy Policy';
 <html lang="en">
 <?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-    <div class="min-h-screen grid grid-rows-[auto_1fr_auto]">
+    <div class="min-h-screen flex flex-col">
+    <header>
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#policy" class="block">Skip to content</a>
     </nav>
     <?php include 'partials/header.php'; ?>
-    <main id="policy" tabindex="-1" class="container mx-auto p-6 max-w-5xl space-y-6 text-gray-900 dark:text-gray-100">
+    </header>
+    <main id="policy" tabindex="-1" class="container mx-auto p-6 max-w-5xl space-y-6 text-gray-900 dark:text-gray-100 flex-1">
         <header class="space-y-2">
             <h1 class="text-3xl font-bold">Privacy Policy</h1>
             <p>Effective as of May 16, 2025</p>
