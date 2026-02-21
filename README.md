@@ -10,5 +10,4 @@ A lightweight IPTV/HLS stream explorer and player.
   periodically cleans its cache.
 - The proxy validates IPv4 and IPv6 addresses to support modern DNS records.
 - Proxy auth:
-  - By default, the browser UI enables a session-based proxy.
-  - For non-browser/programmatic use, set an environment variable `PROXY_TOKEN` and pass `token=...` to `proxy.php` (or include `token=...` in the page URL so the JS will reuse it).
+  - The proxy is intended to be usable only from the site UI and requires a browser session.

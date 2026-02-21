@@ -310,18 +310,6 @@ async function fetchAndRender() {
     }
 }
 
-function getProxyToken() {
-    // Allow passing token via URL (?token=...) for programmatic / non-cookie use.
-    // We persist it for the session so shared links keep working.
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get('token');
-    if (fromUrl) {
-        try { sessionStorage.setItem('proxy_token', fromUrl); } catch {}
-        return fromUrl;
-    }
-    try { return sessionStorage.getItem('proxy_token'); } catch { return null; }
-}
-
 async function fetchWithProxy(url) {
     try {
         debugLog("Fetching directly", url);
@@ -330,11 +318,7 @@ async function fetchWithProxy(url) {
         return await res.text();
     } catch (err) {
         debugLog("Direct fetch failed", err.message, "- trying proxy");
-        const token = getProxyToken();
-        const proxyUrl = token
-            ? `proxy.php?url=${encodeURIComponent(url)}&token=${encodeURIComponent(token)}`
-            : `proxy.php?url=${encodeURIComponent(url)}`;
-        const proxied = await fetch(proxyUrl);
+        const proxied = await fetch(`proxy.php?url=${encodeURIComponent(url)}`);
         if (!proxied.ok) throw new Error(`Proxy HTTP ${proxied.status}`);
         return await proxied.text();
     }

@@ -2,27 +2,11 @@
 session_start();
 
 // Authentication
-// - Browser use: a session is set by index.php
-// - Non-browser / programmatic use: set PROXY_TOKEN in the environment and pass ?token=... to proxy.php
-function proxy_expected_token() {
-    $t = getenv('PROXY_TOKEN');
-    return is_string($t) ? $t : '';
-}
-
-function proxy_has_valid_token() {
-    $expected = proxy_expected_token();
-    if ($expected === '') {
-        return false;
-    }
-    $token = $_GET['token'] ?? '';
-    return is_string($token) && hash_equals($expected, $token);
-}
-
-$session_ok = !empty($_SESSION['user_active']);
-$token_ok = proxy_has_valid_token();
-if (!$session_ok && !$token_ok) {
+// This proxy is intended to be usable only from the site UI.
+// The UI sets a session in index.php; we require that session here.
+if (empty($_SESSION['user_active'])) {
     http_response_code(403);
-    echo 'Session or token required';
+    echo 'Session required';
     exit;
 }
 
