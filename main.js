@@ -623,17 +623,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function hideShareMenu() {
-  if (shareMenu && !shareMenu.classList.contains("hidden")) {
-      debugLog("Hiding share menu");
-      const focusWasInside = shareMenu.contains(document.activeElement);
-      shareMenu.classList.add("hidden");
-      shareBtn.setAttribute("aria-expanded", "false");
-      // Avoid unexpected focus jumps. Only move focus if we'd otherwise leave it on a now-hidden element.
-      if (focusWasInside) shareBtn.focus();
-  }
-}
-
 function updateShareMenuState() {
   if (!sharePlaylistBtn || !shareVideoBtn) {
     debugLog("Share buttons missing - skipping update");
