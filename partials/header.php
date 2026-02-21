@@ -22,7 +22,7 @@
                 id="settingsMenu"
                 role="menu"
                 aria-label="Settings"
-                class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow hidden z-50 max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"
+                class="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded shadow hidden z-50 max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"
               >
                 <div class="px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300">Theme</div>
                 <button role="menuitemradio" aria-checked="false" data-theme="system" class="block w-full text-left px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring dark:hover:bg-gray-800">System</button>
@@ -43,9 +43,32 @@
 
   const items = Array.from(menu.querySelectorAll('[data-theme]'));
 
+  function positionDropdown(btn, menu) {
+    if (!btn || !menu) return;
+
+    menu.classList.add('top-full', 'mt-2');
+    menu.classList.remove('bottom-full', 'mb-2');
+
+    const prevVis = menu.style.visibility;
+    menu.style.visibility = 'hidden';
+
+    const menuRect = menu.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+
+    const overflowBottom = menuRect.bottom > window.innerHeight;
+
+    if (overflowBottom && btnRect.top > menuRect.height) {
+      menu.classList.remove('top-full', 'mt-2');
+      menu.classList.add('bottom-full', 'mb-2');
+    }
+
+    menu.style.visibility = prevVis;
+  }
+
   function openMenu() {
     menu.classList.remove('hidden');
     btn.setAttribute('aria-expanded', 'true');
+    positionDropdown(btn, menu);
     // focus current selection
     const cur = window.__vip_getTheme();
     const el = items.find(i => i.dataset.theme === cur) || items[0];

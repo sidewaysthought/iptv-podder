@@ -146,11 +146,49 @@ function addToHistory(url) {
 
 loadBtn.addEventListener("click", fetchAndRender);
 manifestInput.addEventListener("focus", populateHistory);
+
+function positionDropdown(btn, menu) {
+  if (!btn || !menu) return;
+
+  // Ensure baseline classes exist (downward)
+  menu.classList.add('top-full', 'mt-2');
+  menu.classList.remove('bottom-full', 'mb-2');
+
+  // If it's hidden, temporarily show it for measurement
+  const wasHidden = menu.classList.contains('hidden');
+  if (wasHidden) menu.classList.remove('hidden');
+
+  const prevVis = menu.style.visibility;
+  menu.style.visibility = 'hidden';
+
+  const menuRect = menu.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+
+  const overflowBottom = menuRect.bottom > window.innerHeight;
+  const overflowTop = menuRect.top < 0;
+
+  // If it would overflow the bottom and there's room above the button, flip upward.
+  if (overflowBottom && btnRect.top > menuRect.height) {
+    menu.classList.remove('top-full', 'mt-2');
+    menu.classList.add('bottom-full', 'mb-2');
+  } else if (overflowTop) {
+    // If somehow we overflow the top, force downward.
+    menu.classList.remove('bottom-full', 'mb-2');
+    menu.classList.add('top-full', 'mt-2');
+  }
+
+  // Re-measure after class changes (optional safety)
+  menu.style.visibility = prevVis;
+
+  if (wasHidden) menu.classList.add('hidden');
+}
+
 if (historyBtn) {
     historyBtn.addEventListener("click", () => {
         populateHistory();
         const hidden = historyMenu.classList.toggle("hidden");
         historyBtn.setAttribute("aria-expanded", String(!hidden));
+        if (!hidden) positionDropdown(historyBtn, historyMenu);
         // Don't move focus on mouse/touch open; keep it predictable.
     });
 
@@ -160,6 +198,7 @@ if (historyBtn) {
             populateHistory();
             historyMenu.classList.remove("hidden");
             historyBtn.setAttribute("aria-expanded", "true");
+            positionDropdown(historyBtn, historyMenu);
             const firstItem = historyMenu.querySelector("button[role='menuitem']");
             if (firstItem) firstItem.focus();
         }
@@ -275,6 +314,7 @@ shareBtn.addEventListener("click", () => {
   const hidden = shareMenu.classList.toggle("hidden");
   shareBtn.setAttribute("aria-expanded", String(!hidden));
   updateShareMenuState();
+  if (!hidden) positionDropdown(shareBtn, shareMenu);
   // Don't move focus on mouse/touch open; keep it predictable.
 });
 
@@ -284,6 +324,7 @@ shareBtn.addEventListener("keydown", (e) => {
       shareMenu.classList.remove("hidden");
       shareBtn.setAttribute("aria-expanded", "true");
       updateShareMenuState();
+      positionDropdown(shareBtn, shareMenu);
       const firstItem = shareMenu.querySelector("button[role='menuitem']:not([disabled])");
       if (firstItem) firstItem.focus();
   }
