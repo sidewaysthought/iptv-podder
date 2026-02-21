@@ -12,7 +12,11 @@ if (empty($_SESSION['user_active'])) {
 
 // Configuration
 define('CACHE_TTL', 300); // 5 minutes
-define('MAX_DOWNLOAD_BYTES', 3670016); // 3.5 MB
+// Max size for cached text responses (playlists). Keep small to avoid session bloat.
+define('MAX_CACHE_BYTES', 3670016); // 3.5 MB
+// Max size for streamed binary responses (segments/keys). Tune as needed.
+define('MAX_STREAM_BYTES', 52428800); // 50 MB
+
 define('RATE_LIMIT', 30); // requests
 define('RATE_WINDOW', 3600); // per hour
 define('RATE_DIR', sys_get_temp_dir() . '/proxy_rate');
@@ -148,63 +152,118 @@ if (!isset($_SESSION['proxy_cache'])) {
     $_SESSION['proxy_cache'] = [];
 }
 
-if (isset($_SESSION['proxy_cache'][$key]) && $_SESSION['proxy_cache'][$key]['time'] + CACHE_TTL > time()) {
+$path = strtolower($parts['path'] ?? '');
+$is_playlist = preg_match('/\.m3u8?($|\?)/', $path) === 1;
+
+// Serve cached playlists quickly
+if ($is_playlist && isset($_SESSION['proxy_cache'][$key]) && $_SESSION['proxy_cache'][$key]['time'] + CACHE_TTL > time()) {
     $entry = $_SESSION['proxy_cache'][$key];
-    $data = $entry['data'];
-    $type = $entry['type'];
-} else {
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => false,
-        CURLOPT_USERAGENT => 'IPTV-Proxy',
-        CURLOPT_FOLLOWLOCATION => false,
-        CURLOPT_CONNECTTIMEOUT => 10,
-        CURLOPT_TIMEOUT => 20,
-    ]);
-    $buffer = '';
-    curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $chunk) use (&$buffer) {
-        $buffer .= $chunk;
-        if (strlen($buffer) > MAX_DOWNLOAD_BYTES) {
-            return 0; // abort
-        }
-        return strlen($chunk);
-    });
-    curl_exec($ch);
-    $primary = curl_getinfo($ch, CURLINFO_PRIMARY_IP);
-    if ($primary && filter_var($primary, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-        http_response_code(400);
-        echo 'Refusing private address';
-        curl_close($ch);
-        exit;
-    }
-    $http = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    if ($http >= 300 && $http < 400) {
-        http_response_code(502);
-        echo 'Remote redirect not allowed';
-        curl_close($ch);
-        exit;
-    }
-    if (curl_errno($ch) === CURLE_WRITE_ERROR && strlen($buffer) > MAX_DOWNLOAD_BYTES) {
-        http_response_code(413);
-        echo 'Response too large';
-        curl_close($ch);
-        exit;
-    }
-    if (curl_errno($ch)) {
-        http_response_code(502);
-        echo 'Failed to fetch';
-        curl_close($ch);
-        exit;
-    }
-    $data = $buffer;
-    $type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'text/plain';
-    curl_close($ch);
-    $_SESSION['proxy_cache'][$key] = [
-        'time' => time(),
-        'data' => $data,
-        'type' => $type,
-    ];
+    header('Content-Type: ' . $entry['type']);
+    echo $entry['data'];
+    exit;
 }
 
-header('Content-Type: ' . $type);
-echo $data;
+$ch = curl_init($url);
+
+// Capture content-type as early as possible
+$contentType = 'application/octet-stream';
+curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($ch, $header) use (&$contentType) {
+    $len = strlen($header);
+    if (stripos($header, 'Content-Type:') === 0) {
+        $value = trim(substr($header, strlen('Content-Type:')));
+        if ($value !== '') {
+            $contentType = $value;
+        }
+    }
+    return $len;
+});
+
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => false,
+    CURLOPT_USERAGENT => 'IPTV-Proxy',
+    // Allow redirects (some providers return 302 on manifests/segments). Primary IP check still prevents private-net SSRF.
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_MAXREDIRS => 3,
+    CURLOPT_CONNECTTIMEOUT => 10,
+    CURLOPT_TIMEOUT => 30,
+]);
+
+$sentHeaders = false;
+$total = 0;
+$buffer = '';
+$maxBytes = $is_playlist ? MAX_CACHE_BYTES : MAX_STREAM_BYTES;
+
+curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $chunk) use (&$sentHeaders, &$total, &$buffer, $maxBytes, $is_playlist, &$contentType) {
+    $len = strlen($chunk);
+    $total += $len;
+    if ($total > $maxBytes) {
+        return 0; // abort
+    }
+
+    if ($is_playlist) {
+        $buffer .= $chunk;
+        return $len;
+    }
+
+    if (!$sentHeaders) {
+        header('Content-Type: ' . $contentType);
+        header('Cache-Control: no-store');
+        $sentHeaders = true;
+    }
+
+    echo $chunk;
+    if (function_exists('fastcgi_finish_request')) {
+        // no-op; just ensures function exists in some hosts
+    }
+    flush();
+    return $len;
+});
+
+curl_exec($ch);
+
+$primary = curl_getinfo($ch, CURLINFO_PRIMARY_IP);
+if ($primary && filter_var($primary, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+    http_response_code(400);
+    echo 'Refusing private address';
+    curl_close($ch);
+    exit;
+}
+
+if (curl_errno($ch) === CURLE_WRITE_ERROR && $total > $maxBytes) {
+    http_response_code(413);
+    echo 'Response too large';
+    curl_close($ch);
+    exit;
+}
+
+if (curl_errno($ch)) {
+    http_response_code(502);
+    echo 'Failed to fetch';
+    curl_close($ch);
+    exit;
+}
+
+$http = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+if ($http >= 400) {
+    http_response_code($http);
+    echo $is_playlist ? $buffer : '';
+    curl_close($ch);
+    exit;
+}
+
+$type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: $contentType;
+curl_close($ch);
+
+if ($is_playlist) {
+    if (!$sentHeaders) {
+        header('Content-Type: ' . $type);
+    }
+    echo $buffer;
+    if (strlen($buffer) <= MAX_CACHE_BYTES) {
+        $_SESSION['proxy_cache'][$key] = [
+            'time' => time(),
+            'data' => $buffer,
+            'type' => $type,
+        ];
+    }
+}
