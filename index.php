@@ -73,12 +73,8 @@ $pageTitle = 'View IPTV';
                 </div>
 
                 <!-- Streams list -->
-                <div id="listWrapper" class="flex-1 min-h-0">
-                    <ul
-                      id="streamList"
-                      class="space-y-1 text-blue-700 p-2 pr-3 dark:text-blue-300 overflow-y-auto min-h-0"
-                      style="max-height: 70vh;"
-                    ></ul>
+                <div id="listWrapper" class="flex-1 min-h-0 overflow-y-auto">
+                    <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3 dark:text-blue-300"></ul>
                 </div>
                 <div class="border-t text-xs text-gray-800 p-2 dark:text-gray-100" aria-label="Stream status legend">
                     <p class="font-semibold">Status legend</p>
