@@ -64,7 +64,7 @@ $pageTitle = 'View IPTV';
         <div class="flex flex-col lg:flex-row gap-4 mt-6">
             <!-- Sidebar: search + list -->
             <aside id="playlistContainer"
-                class="lg:w-1/3 w-full flex flex-col border border-gray-300 rounded shadow-sm overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-700">
+                class="lg:w-1/3 w-full flex flex-col min-h-0 border border-gray-300 rounded shadow-sm overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-700 max-h-[70vh] lg:max-h-[calc(100vh-14rem)]">
                 <!-- Search -->
                 <div id="searchWrap" class="hidden p-2 border-b border-gray-200">
                     <label for="searchInput" class="sr-only">Filter channels</label>
@@ -73,7 +73,7 @@ $pageTitle = 'View IPTV';
                 </div>
 
                 <!-- Streams list -->
-                <div id="listWrapper" class="flex-1 overflow-y-auto">
+                <div id="listWrapper" class="flex-1 min-h-0 overflow-y-auto">
                     <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3 dark:text-blue-300"></ul>
                 </div>
                 <div class="border-t text-xs text-gray-800 p-2 dark:text-gray-100" aria-label="Stream status legend">
