@@ -79,6 +79,8 @@
 
   btn.addEventListener('click', (e) => {
     e.preventDefault();
+    // Prevent the document-level click handler from immediately closing the menu
+    e.stopPropagation();
     if (isOpen()) closeMenu(); else openMenu();
   });
 
@@ -116,7 +118,8 @@
 
   document.addEventListener('click', (e) => {
     if (!isOpen()) return;
-    if (!menu.contains(e.target) && e.target !== btn) {
+    // Close when clicking outside the menu *and* outside the button (including its children).
+    if (!menu.contains(e.target) && !btn.contains(e.target)) {
       closeMenu();
     }
   });
