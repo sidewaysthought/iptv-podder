@@ -1,4 +1,4 @@
-<header class="bg-gray-200 dark:bg-gray-900">
+<header class="bg-gray-200 dark:bg-gray-900 relative z-50">
     <div class="container mx-auto max-w-6xl flex justify-between items-center p-4">
         <div class="font-semibold text-gray-900 dark:text-gray-100">View-IPTV.stream</div>
         <nav class="space-x-4 flex items-center">
@@ -22,7 +22,7 @@
                 id="settingsMenu"
                 role="menu"
                 aria-label="Settings"
-                class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow hidden dark:bg-gray-900 dark:border-gray-700"
+                class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow hidden z-50 dark:bg-gray-900 dark:border-gray-700"
               >
                 <div class="px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300">Theme</div>
                 <button role="menuitemradio" aria-checked="false" data-theme="system" class="block w-full text-left px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring dark:hover:bg-gray-800">System</button>
