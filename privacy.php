@@ -5,7 +5,8 @@ $pageTitle = 'Privacy Policy';
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
-<body class="min-h-screen flex flex-col bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <div class="min-h-screen flex flex-col">
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#policy" class="block">Skip to content</a>
     </nav>
@@ -107,5 +108,6 @@ $pageTitle = 'Privacy Policy';
         </section>
     </main>
     <?php include 'partials/footer.php'; ?>
+    </div>
 </body>
 </html>
