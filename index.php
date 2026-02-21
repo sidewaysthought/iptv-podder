@@ -73,10 +73,14 @@ $pageTitle = 'View IPTV';
                 <div id="listWrapper" class="flex-1 overflow-y-auto">
                     <ul id="streamList" class="space-y-1 text-blue-700 p-2 pr-3"></ul>
                 </div>
-                <div class="border-t text-xs text-gray-700 p-2 space-x-4" aria-label="Legend">
-                    <span><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> = playing</span>
-                    <span><span aria-hidden="true" class="text-red-500">🚫</span> <span class="sr-only">Error</span> = failed</span>
-                    <span><span aria-hidden="true" class="text-red-500">⛓️‍💥</span> <span class="sr-only">Missing</span> = not found</span>
+                <div class="border-t text-xs text-gray-800 p-2" aria-label="Stream status legend">
+                    <p class="font-semibold">Status legend</p>
+                    <ul class="mt-1 space-y-1">
+                        <li><span aria-hidden="true">⏳</span> <span class="sr-only">Loading</span> Loading (trying to play)</li>
+                        <li><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> Playing now</li>
+                        <li><span aria-hidden="true">✓</span> <span class="sr-only">Works</span> Works (played before)</li>
+                        <li><span aria-hidden="true">✕</span> <span class="sr-only">Failed</span> Failed to play</li>
+                    </ul>
                 </div>
             </aside>
 
