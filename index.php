@@ -8,13 +8,13 @@ $pageTitle = 'View IPTV';
 <?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <div class="min-h-screen flex flex-col">
-    <header>
+    <div>
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
         <a href="#playlistForm" class="block">Skip to playlist</a>
         <a href="#videoPlayer" class="block">Skip to video player</a>
     </nav>
     <?php include 'partials/header.php'; ?>
-    </header>
+    </div>
     <main class="container mx-auto p-6 max-w-6xl flex-1">
         <!-- Header -->
         <header class="mb-4">
