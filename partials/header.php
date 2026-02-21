@@ -4,53 +4,130 @@
         <nav class="space-x-4 flex items-center">
             <a href="index.php" class="text-blue-700 hover:underline dark:text-blue-300">Home</a>
 
-            <!-- Theme toggle: defaults to system preference, but user can override -->
-            <button
-              id="themeToggle"
-              type="button"
-              class="px-2 py-1 rounded text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800"
-              aria-label="Toggle dark mode"
-            >
-              <span id="themeIcon" aria-hidden="true">🌙</span>
-              <span class="sr-only" id="themeText">Theme</span>
-            </button>
+            <!-- Settings: theme selector (system default + explicit user choice) -->
+            <div class="relative">
+              <button
+                id="settingsBtn"
+                type="button"
+                class="px-2 py-1 rounded text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800"
+                aria-haspopup="menu"
+                aria-controls="settingsMenu"
+                aria-expanded="false"
+              >
+                <span aria-hidden="true">⚙</span>
+                <span class="sr-only">Settings</span>
+              </button>
+
+              <div
+                id="settingsMenu"
+                role="menu"
+                aria-label="Settings"
+                class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded shadow hidden dark:bg-gray-900 dark:border-gray-700"
+              >
+                <div class="px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300">Theme</div>
+                <button role="menuitemradio" aria-checked="false" data-theme="system" class="block w-full text-left px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring dark:hover:bg-gray-800">System</button>
+                <button role="menuitemradio" aria-checked="false" data-theme="dark" class="block w-full text-left px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring dark:hover:bg-gray-800">Dark</button>
+                <button role="menuitemradio" aria-checked="false" data-theme="light" class="block w-full text-left px-3 py-2 hover:bg-gray-100 focus:outline-none focus:ring dark:hover:bg-gray-800">Light</button>
+              </div>
+            </div>
         </nav>
     </div>
 </header>
 
 <script>
 (function () {
-  const btn = document.getElementById('themeToggle');
-  const icon = document.getElementById('themeIcon');
-  if (!btn || !icon || typeof window.__vip_getTheme !== 'function' || typeof window.__vip_setTheme !== 'function') return;
+  const btn = document.getElementById('settingsBtn');
+  const menu = document.getElementById('settingsMenu');
+
+  if (!btn || !menu || typeof window.__vip_getTheme !== 'function' || typeof window.__vip_setTheme !== 'function') return;
+
+  const items = Array.from(menu.querySelectorAll('[data-theme]'));
+
+  function openMenu() {
+    menu.classList.remove('hidden');
+    btn.setAttribute('aria-expanded', 'true');
+    // focus current selection
+    const cur = window.__vip_getTheme();
+    const el = items.find(i => i.dataset.theme === cur) || items[0];
+    el?.focus();
+  }
+
+  function closeMenu() {
+    menu.classList.add('hidden');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function isOpen() {
+    return !menu.classList.contains('hidden');
+  }
 
   function render() {
-    const theme = window.__vip_getTheme();
-    const isDark = document.documentElement.classList.contains('dark');
+    const cur = window.__vip_getTheme();
+    items.forEach((el) => {
+      const checked = el.dataset.theme === cur;
+      el.setAttribute('aria-checked', checked ? 'true' : 'false');
+      el.classList.toggle('font-semibold', checked);
+    });
 
-    // 3-state cycle: system -> dark -> light -> system
-    // UI: show the *current effective* mode by icon.
-    icon.textContent = isDark ? '☀' : '🌙';
-
-    const label = theme === 'system'
-      ? `Theme: system (${isDark ? 'dark' : 'light'}) — click to override`
-      : `Theme: ${theme} — click to switch`;
-
+    const effectiveDark = document.documentElement.classList.contains('dark');
+    const label = cur === 'system'
+      ? `Settings. Theme: system (${effectiveDark ? 'dark' : 'light'}).`
+      : `Settings. Theme: ${cur}.`;
     btn.setAttribute('aria-label', label);
     btn.setAttribute('title', label);
-    btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
   }
 
-  function nextTheme(current) {
-    if (current === 'system') return 'dark';
-    if (current === 'dark') return 'light';
-    return 'system';
-  }
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (isOpen()) closeMenu(); else openMenu();
+  });
 
-  btn.addEventListener('click', () => {
-    const cur = window.__vip_getTheme();
-    window.__vip_setTheme(nextTheme(cur));
-    render();
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!isOpen()) openMenu();
+    }
+  });
+
+  items.forEach((el) => {
+    el.addEventListener('click', () => {
+      const theme = el.dataset.theme;
+      window.__vip_setTheme(theme);
+      render();
+      closeMenu();
+      btn.focus();
+    });
+
+    el.addEventListener('keydown', (e) => {
+      const idx = items.indexOf(el);
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeMenu();
+        btn.focus();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        (items[idx + 1] || items[0]).focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        (items[idx - 1] || items[items.length - 1]).focus();
+      }
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!isOpen()) return;
+    if (!menu.contains(e.target) && e.target !== btn) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeMenu();
+      btn.focus();
+    }
   });
 
   window.addEventListener('vip:theme', render);
