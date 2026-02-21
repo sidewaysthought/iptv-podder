@@ -556,9 +556,20 @@ async function play(url, li) {
                 loader: ProxyLoader,
                 pLoader: ProxyLoader,
                 fLoader: ProxyLoader,
-                xhrSetup: (xhr /*, url */) => {
-                    // Avoid sending referrer; keep it simple and reduce cross-site weirdness.
+                // Belt-and-suspenders: force any XHR-based loads through the proxy,
+                // even if a particular hls.js build bypasses custom loaders.
+                xhrSetup: (xhr, u) => {
                     try { xhr.withCredentials = false; } catch {}
+                    try {
+                        xhr.open('GET', proxifyUrl(u), true);
+                    } catch {}
+                },
+                // For fetch-loader paths in newer hls.js
+                fetchSetup: (context, init) => {
+                    return new Request(proxifyUrl(context.url), {
+                        ...init,
+                        credentials: 'omit',
+                    });
                 },
             });
             hls.loadSource(url);
