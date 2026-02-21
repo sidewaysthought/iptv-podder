@@ -2,7 +2,16 @@ import { getErrorIcon } from "./error-icons.js";
 
 let hls = null;
 
+function isAlreadyProxied(url) {
+  if (!url) return false;
+  // handle relative and absolute proxy URLs
+  if (url.startsWith('proxy.php?url=')) return true;
+  if (url.includes('/proxy.php?url=')) return true;
+  return false;
+}
+
 function proxifyUrl(url) {
+  if (isAlreadyProxied(url)) return url;
   return `proxy.php?url=${encodeURIComponent(url)}`;
 }
 
@@ -560,13 +569,18 @@ async function play(url, li) {
                 // even if a particular hls.js build bypasses custom loaders.
                 xhrSetup: (xhr, u) => {
                     try { xhr.withCredentials = false; } catch {}
-                    try {
-                        xhr.open('GET', proxifyUrl(u), true);
-                    } catch {}
+                    // Avoid double-proxying if a loader already rewrote the URL.
+                    if (!isAlreadyProxied(u)) {
+                        try { xhr.open('GET', proxifyUrl(u), true); } catch {}
+                    }
                 },
                 // For fetch-loader paths in newer hls.js
                 fetchSetup: (context, init) => {
-                    return new Request(proxifyUrl(context.url), {
+                    const u = context?.url;
+                    if (isAlreadyProxied(u)) {
+                        return new Request(u, { ...init, credentials: 'omit' });
+                    }
+                    return new Request(proxifyUrl(u), {
                         ...init,
                         credentials: 'omit',
                     });
