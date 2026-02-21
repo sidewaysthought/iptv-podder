@@ -3,3 +3,5 @@
     <p>Copyright &copy; 2025 Sideways Thought LLC.</p>
     <p><a href="index.php" class="text-blue-600 hover:underline">Home</a> | <a href="privacy.php" class="text-blue-600 hover:underline">Privacy Policy</a></p>
 </footer>
+
+<?php include 'partials/consent.php'; ?>
