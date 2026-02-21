@@ -1,5 +1,3 @@
-import { getErrorIcon } from "./error-icons.js";
-
 let hls = null;
 
 function isAlreadyProxied(url) {
@@ -46,7 +44,13 @@ class ProxyLoader extends Hls.DefaultConfig.loader {
 
 let dashPlayer = null;
 let activeLi = null;
+let activeUri = null;
 let currentPlaylist = null;
+
+// Track the last known status of each stream so we can show a persistent checkmark
+// even after switching away.
+// status: 'untested' | 'pending' | 'playing' | 'ok' | 'failed'
+const streamStatusByUri = new Map();
 
 // Enable verbose logging when ?debug is present in the URL
 const DEBUG = new URLSearchParams(window.location.search).has("debug");
@@ -428,6 +432,7 @@ function parsePlaylist(baseUrl, text) {
 function renderList(items) {
     streamList.innerHTML = "";
     activeLi = null;
+    activeUri = null;
 
     if (!items.length) {
         showPlaceholder();
@@ -449,19 +454,36 @@ function renderList(items) {
         nameSpan.textContent = item.label || `Stream ${idx + 1}`;
         btn.appendChild(nameSpan);
 
+        const pendingIcon = document.createElement("span");
+        pendingIcon.className = "pendingIcon ml-1 hidden";
+        pendingIcon.setAttribute("aria-label", "loading");
+        pendingIcon.textContent = "⏳";
+        btn.appendChild(pendingIcon);
+
         const playIcon = document.createElement("span");
         playIcon.className = "playIcon ml-1 hidden";
         playIcon.setAttribute("aria-label", "playing");
         playIcon.textContent = "▶";
         btn.appendChild(playIcon);
 
+        const okIcon = document.createElement("span");
+        okIcon.className = "okIcon ml-1 hidden text-green-600";
+        okIcon.setAttribute("aria-label", "works");
+        okIcon.textContent = "✓";
+        btn.appendChild(okIcon);
+
         const errorIcon = document.createElement("span");
         errorIcon.className = "errorIcon ml-1 hidden text-red-500";
-        errorIcon.setAttribute("aria-label", "error");
-        errorIcon.textContent = getErrorIcon();
+        errorIcon.setAttribute("aria-label", "failed");
+        errorIcon.textContent = "✕";
         btn.appendChild(errorIcon);
 
         li.title = item.group;
+
+        // Apply any remembered status for this stream (e.g., show ✓ after switching away).
+        const remembered = streamStatusByUri.get(item.uri);
+        if (remembered) setStreamStatus(li, remembered);
+
         btn.addEventListener("click", () => play(item.uri, li));
 
         li.appendChild(btn);
@@ -476,12 +498,45 @@ function showPlaceholder() {
     updateShareMenuState();
 }
 
+function hideStatusIcons(li) {
+    if (!li) return;
+    li.querySelector(".pendingIcon")?.classList.add("hidden");
+    li.querySelector(".playIcon")?.classList.add("hidden");
+    li.querySelector(".okIcon")?.classList.add("hidden");
+    li.querySelector(".errorIcon")?.classList.add("hidden");
+}
+
+function setStreamStatus(li, status) {
+    if (!li) return;
+    hideStatusIcons(li);
+
+    if (status === "pending") {
+        li.querySelector(".pendingIcon")?.classList.remove("hidden");
+    } else if (status === "playing") {
+        li.querySelector(".playIcon")?.classList.remove("hidden");
+    } else if (status === "ok") {
+        li.querySelector(".okIcon")?.classList.remove("hidden");
+    } else if (status === "failed") {
+        li.querySelector(".errorIcon")?.classList.remove("hidden");
+    }
+
+    const uri = li.dataset.uri;
+    if (uri) streamStatusByUri.set(uri, status);
+}
+
 async function play(url, li) {
     debugLog("Playing", url);
-    // Reset icons on previous active entry
-    if (activeLi) {
-        activeLi.querySelector(".playIcon").classList.add("hidden");
-        activeLi.querySelector(".errorIcon").classList.add("hidden");
+    // If switching streams, mark the previous one as "works" (✓) if it was playing.
+    if (activeLi && activeLi !== li) {
+        const prev = streamStatusByUri.get(activeUri);
+        if (prev === "playing") {
+            setStreamStatus(activeLi, "ok");
+        } else {
+            // Leave any existing remembered state (ok/failed/untested) as-is.
+            hideStatusIcons(activeLi);
+            const remembered = streamStatusByUri.get(activeUri);
+            if (remembered) setStreamStatus(activeLi, remembered);
+        }
     }
 
     const resetPlayer = () => {
@@ -542,7 +597,7 @@ async function play(url, li) {
         if (attemptIndex < attempts.length) {
             startAttempt();
         } else {
-            setErrorIcon(li);
+            setStreamStatus(li, "failed");
             announce(`Playback error: ${li?.dataset.label || 'Stream'}`);
         }
     };
@@ -555,6 +610,24 @@ async function play(url, li) {
 
         video.addEventListener("loadedmetadata", onLoaded, { once: true });
         video.addEventListener("error", onError, { once: true });
+
+        // Mark the stream as actually playing only once media playback really starts.
+        // (We don't want to show ▶ while we're still cycling through attempts.)
+        const onPlaying = () => {
+            if (activeLi === li && activeUri === url) {
+                setStreamStatus(li, "playing");
+
+                // If playback stops later (paused/ended), keep a visible ✓ to show it worked.
+                const onStopped = () => {
+                    if (activeLi === li && activeUri === url) {
+                        setStreamStatus(li, "ok");
+                    }
+                };
+                video.addEventListener("pause", onStopped, { once: true });
+                video.addEventListener("ended", onStopped, { once: true });
+            }
+        };
+        video.addEventListener("playing", onPlaying, { once: true });
 
         if (kind === "hls") {
             if (!Hls.isSupported()) {
@@ -613,29 +686,16 @@ async function play(url, li) {
         video.play().catch(onError);
     };
 
+    // Make status immediately obvious while we cycle through methods.
+    setStreamStatus(li, "pending");
+    activeLi = li;
+    activeUri = url;
+    updateShareMenuState();
+
     // Skip preflight existence checks: they trigger CORS errors on many providers.
     startAttempt();
-
-    setPlayIcon(li);
-    activeLi = li;
-    updateShareMenuState();
 }
 
-function setPlayIcon(li) {
-    if (!li) return;
-    li.querySelector(".errorIcon").classList.add("hidden");
-    li.querySelector(".playIcon").classList.remove("hidden");
-}
-
-function setErrorIcon(li, status) {
-    if (!li) return;
-    li.querySelector(".playIcon").classList.add("hidden");
-    const errorIcon = li.querySelector(".errorIcon");
-    if (errorIcon) {
-        errorIcon.textContent = getErrorIcon(status);
-        errorIcon.classList.remove("hidden");
-    }
-}
 
 function resolveUrl(base, path) {
     try {
