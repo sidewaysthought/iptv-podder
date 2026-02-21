@@ -93,7 +93,6 @@ $pageTitle = 'View IPTV';
     <!-- Screen reader announcements for dynamic updates -->
     <div id="srStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="error-icons.js"></script>
-    <script src="main.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
