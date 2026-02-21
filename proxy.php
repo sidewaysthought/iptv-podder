@@ -17,8 +17,14 @@ define('MAX_CACHE_BYTES', 3670016); // 3.5 MB
 // Max size for streamed binary responses (segments/keys). Tune as needed.
 define('MAX_STREAM_BYTES', 52428800); // 50 MB
 
-define('RATE_LIMIT', 30); // requests
-define('RATE_WINDOW', 3600); // per hour
+// Rate limit: playlists are low-volume; HLS playback is high-volume (segments).
+// Keep a conservative limit for playlists, and a higher one for segment/asset streaming.
+define('RATE_LIMIT_PLAYLIST', 60); // requests
+define('RATE_WINDOW_PLAYLIST', 3600); // per hour
+
+define('RATE_LIMIT_STREAM', 2400); // requests
+define('RATE_WINDOW_STREAM', 3600); // per hour
+
 define('RATE_DIR', sys_get_temp_dir() . '/proxy_rate');
 
 function cleanup_cache() {
@@ -33,36 +39,44 @@ function cleanup_cache() {
     }
 }
 
-function rate_limit() {
+function rate_limit($bucket = 'playlist') {
     $dir = RATE_DIR;
     if (!is_dir($dir)) {
         mkdir($dir, 0700, true);
     }
+
+    $limit = ($bucket === 'stream') ? RATE_LIMIT_STREAM : RATE_LIMIT_PLAYLIST;
+    $window = ($bucket === 'stream') ? RATE_WINDOW_STREAM : RATE_WINDOW_PLAYLIST;
+
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $file = $dir . '/' . sha1($ip);
+    $file = $dir . '/' . sha1($bucket . ':' . $ip);
     $now = time();
+
     $entries = [];
     if (file_exists($file)) {
         $json = file_get_contents($file);
         $entries = json_decode($json, true) ?: [];
     }
-    $entries = array_values(array_filter($entries, fn($t) => $t + RATE_WINDOW > $now));
-    if (count($entries) >= RATE_LIMIT) {
+
+    $entries = array_values(array_filter($entries, fn($t) => $t + $window > $now));
+
+    if (count($entries) >= $limit) {
         http_response_code(429);
         echo 'Too many requests';
         exit;
     }
+
     $entries[] = $now;
     file_put_contents($file, json_encode($entries));
 
-    // Cleanup old files
+    // Cleanup old files (best-effort)
     foreach (glob($dir . '/*') as $f) {
         $data = json_decode(@file_get_contents($f), true);
         if (!is_array($data)) {
             @unlink($f);
             continue;
         }
-        $data = array_values(array_filter($data, fn($t) => $t + RATE_WINDOW > $now));
+        $data = array_values(array_filter($data, fn($t) => $t + $window > $now));
         if (empty($data)) {
             @unlink($f);
         } else {
@@ -123,8 +137,6 @@ if (!$https_on) {
 // Auth is enforced via session or PROXY_TOKEN; allow cross-origin reads.
 header('Access-Control-Allow-Origin: *');
 
-rate_limit();
-
 $url = $_GET['url'] ?? '';
 if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
     http_response_code(400);
@@ -154,6 +166,9 @@ if (!isset($_SESSION['proxy_cache'])) {
 
 $path = strtolower($parts['path'] ?? '');
 $is_playlist = preg_match('/\.m3u8?($|\?)/', $path) === 1;
+
+// Apply rate limiting after we've classified the request type.
+rate_limit($is_playlist ? 'playlist' : 'stream');
 
 // Serve cached playlists quickly
 if ($is_playlist && isset($_SESSION['proxy_cache'][$key]) && $_SESSION['proxy_cache'][$key]['time'] + CACHE_TTL > time()) {
