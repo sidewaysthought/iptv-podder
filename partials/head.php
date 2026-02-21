@@ -63,6 +63,17 @@ if (empty($pageTitle)) {
 
     <!-- Tailwind CSS (built locally; pinned version; supports darkMode='class') -->
     <link rel="stylesheet" href="assets/tailwind.css" />
+
+    <!-- Layout safety: prevent large playlists from inflating document height.
+         Tailwind classes should already do this, but we add a small CSS fallback
+         so long lists reliably scroll in the sidebar even if a class is missing/not applied. -->
+    <style>
+      #playlistContainer { max-height: 70vh; min-height: 0; }
+      #listWrapper { min-height: 0; overflow-y: auto; }
+      @media (min-width: 1024px) {
+        #playlistContainer { max-height: calc(100vh - 14rem); }
+      }
+    </style>
     <!-- hls.js -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <!-- dash.js -->
