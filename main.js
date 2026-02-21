@@ -511,8 +511,9 @@ async function play(url, li) {
         attempts.push("native");
     }
 
-    // Try dash.js after HLS for additional coverage
-    if (hasDash && (isDash || attempts.includes("hls"))) {
+    // Only try dash.js when the URL is actually a DASH manifest.
+    // Trying dash.js on HLS URLs just causes extra direct network requests (and CORS failures on providers like Pluto).
+    if (hasDash && isDash) {
         attempts.push("dash");
     }
 
@@ -603,9 +604,10 @@ async function play(url, li) {
                 onError(new Error(e?.event?.message || e?.message || "DASH fatal error"));
             };
             dashPlayer.on(dashjs.MediaPlayer.events.ERROR, handleDashError);
-            dashPlayer.initialize(video, url, true);
+            dashPlayer.initialize(video, proxifyUrl(url), true);
         } else {
-            video.src = url;
+            // Native playback attempt should also go through the proxy to avoid CORS.
+            video.src = proxifyUrl(url);
         }
 
         video.play().catch(onError);
