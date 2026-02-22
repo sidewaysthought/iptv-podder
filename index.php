@@ -19,6 +19,22 @@ $pageTitle = 'View IPTV';
 <?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
     <style>
+        :root {
+            --site-header-height: 4.5rem;
+            --site-player-height: clamp(13rem, 49vw, 32rem);
+            --site-footer-height: 5rem;
+        }
+
+        #fixedPlayerRow {
+            top: var(--site-header-height);
+            min-height: var(--site-player-height);
+        }
+
+        #appMain {
+            padding-top: calc(var(--site-header-height) + var(--site-player-height));
+            padding-bottom: calc(var(--site-footer-height) + 1rem);
+        }
+
         @media (min-width: 640px) {
             #playerWrapper {
                 padding-top: min(45%, 45vh) !important;
@@ -34,10 +50,10 @@ $pageTitle = 'View IPTV';
     </nav>
     <?php include 'partials/header.php'; ?>
     </div>
-    <main class="w-full flex-1 min-h-0 flex flex-col pb-20">
+    <main id="appMain" class="w-full">
 
         <!-- Row: player -->
-        <section class="w-full">
+        <section id="fixedPlayerRow" class="fixed inset-x-0 z-40 w-full bg-gray-100 dark:bg-gray-950">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
                 <h2 id="playerHeading" class="sr-only">Video player</h2>
                 <div class="max-w-5xl mx-auto">
@@ -49,7 +65,7 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: controls bar (full width stripe, inset controls) -->
-        <section class="w-full sticky top-0 z-30 border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <section class="w-full border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
                 <h2 id="playlistControlsHeading" class="sr-only">Playlist controls</h2>
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
@@ -98,8 +114,8 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: playlist browsing (search + scrollable channel grid) -->
-        <section id="playlistPanel" class="w-full flex-1 min-h-0">
-            <div class="w-full px-4 sm:px-6 py-4 flex flex-col min-h-0">
+        <section id="playlistPanel" class="w-full">
+            <div class="w-full px-4 sm:px-6 py-4">
                 <h2 id="streamGridHeading" class="sr-only">Stream list</h2>
                 <!-- Filter UI can be re-enabled later; keep DOM element for JS but hide it for now. -->
                 <div id="searchWrap" class="hidden w-full" hidden>
@@ -108,7 +124,7 @@ $pageTitle = 'View IPTV';
                         class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
                 </div>
 
-                <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto pb-4">
+                <div id="listWrapper" class="mt-6 pb-4">
                     <div id="streamList" class="grid gap-3 w-full mx-auto" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 220px)); justify-content: center; gap: 0.75rem; max-width: calc((220px * 6) + (0.75rem * 5));"></div>
                 </div>
             </div>
