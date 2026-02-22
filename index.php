@@ -40,6 +40,23 @@ $pageTitle = 'View IPTV';
             }
         }
     </style>
+    <script>
+        (function () {
+            function syncHeaderHeight() {
+                const header = document.querySelector('header');
+                if (!header) return;
+
+                const height = header.getBoundingClientRect().height;
+                if (height > 0) {
+                    document.documentElement.style.setProperty('--site-header-height', `${height}px`);
+                }
+            }
+
+            window.addEventListener('DOMContentLoaded', syncHeaderHeight);
+            window.addEventListener('load', syncHeaderHeight);
+            window.addEventListener('resize', syncHeaderHeight);
+        })();
+    </script>
     <div class="min-h-screen flex flex-col">
     <div>
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
