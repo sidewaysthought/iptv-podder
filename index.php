@@ -21,7 +21,6 @@ $pageTitle = 'View IPTV';
     <style>
         :root {
             --site-header-height: 4.5rem;
-            --site-player-height: clamp(10rem, 45vw, 28rem);
             --site-footer-height: 5rem;
         }
 
@@ -30,7 +29,7 @@ $pageTitle = 'View IPTV';
         }
 
         #appMain {
-            padding-top: calc(var(--site-header-height) + var(--site-player-height));
+            padding-top: var(--site-header-height);
             padding-bottom: calc(var(--site-footer-height) + 1rem);
         }
 
@@ -52,7 +51,7 @@ $pageTitle = 'View IPTV';
     <main id="appMain" class="w-full">
 
         <!-- Row: player -->
-        <section id="fixedPlayerRow" class="fixed inset-x-0 z-40 w-full bg-gray-100 dark:bg-black">
+        <section id="fixedPlayerRow" class="sticky inset-x-0 z-40 w-full bg-gray-100 dark:bg-black">
             <div class="max-w-6xl mx-auto px-4 sm:px-6">
                 <h2 id="playerHeading" class="sr-only">Video player</h2>
                 <div class="max-w-5xl mx-auto">
