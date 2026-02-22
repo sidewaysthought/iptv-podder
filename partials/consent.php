@@ -21,14 +21,14 @@
       <button
         id="consentReject"
         type="button"
-        class="px-3 py-2 border border-slate-300 rounded bg-white text-gray-800 hover:bg-slate-100 focus:outline-none focus:ring"
+        class="px-3 py-2 border border-sky-200 rounded bg-gradient-to-r from-white via-sky-50 to-blue-100 text-slate-800 hover:from-sky-50 hover:to-blue-200 focus:outline-none focus:ring"
       >
         Reject
       </button>
       <button
         id="consentAccept"
         type="button"
-        class="px-3 py-2 rounded border border-slate-300 bg-white text-gray-800 hover:bg-slate-100 focus:outline-none focus:ring"
+        class="px-3 py-2 rounded border border-sky-200 bg-gradient-to-r from-white via-sky-50 to-blue-100 text-slate-800 hover:from-sky-50 hover:to-blue-200 focus:outline-none focus:ring"
       >
         Accept
       </button>
