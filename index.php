@@ -90,7 +90,7 @@ $pageTitle = 'View IPTV';
                 </div>
 
                 <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto">
-                    <div id="streamList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-5xl mx-auto"></div>
+                    <div id="streamList" class="grid gap-2 w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"></div>
                 </div>
 
                 <div class="mt-3 border-t text-xs text-gray-800 pt-3 dark:text-gray-100" aria-label="Stream status legend">
