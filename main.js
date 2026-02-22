@@ -484,8 +484,8 @@ shareVideoBtn.addEventListener("click", () => {
 searchInput.addEventListener("input", () => {
     const term = searchInput.value.trim().toLowerCase();
     debugLog("Filtering", term);
-    [...streamList.children].forEach((li) => {
-        li.classList.toggle("hidden", !li.dataset.label?.toLowerCase().includes(term));
+    [...streamList.children].forEach((el) => {
+        el.classList.toggle("hidden", !el.dataset.label?.toLowerCase().includes(term));
     });
 });
 
@@ -606,63 +606,88 @@ function renderList(items) {
     updateShareMenuState();
 
     items.forEach((item, idx) => {
-        const li = document.createElement("li");
-        li.dataset.label = item.label;
-        li.dataset.uri = item.uri;
-
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "w-full text-left cursor-pointer hover:underline flex items-center focus:outline-none focus:ring";
+        btn.dataset.label = item.label;
+        btn.dataset.uri = item.uri;
+        btn.title = item.group;
+        btn.className = [
+          'streamBtn',
+          'w-full',
+          'text-left',
+          'cursor-pointer',
+          'rounded',
+          'border',
+          'border-gray-200',
+          'bg-white',
+          'p-3',
+          'shadow-sm',
+          'hover:bg-gray-50',
+          'focus:outline-none',
+          'focus:ring',
+          'dark:bg-gray-900',
+          'dark:border-gray-700',
+          'dark:hover:bg-gray-800',
+        ].join(' ');
+
+        const row = document.createElement('div');
+        row.className = 'flex items-start justify-between gap-2';
 
         const nameSpan = document.createElement("span");
+        nameSpan.className = 'font-medium text-blue-700 dark:text-blue-300 break-words';
         nameSpan.textContent = item.label || `Stream ${idx + 1}`;
-        btn.appendChild(nameSpan);
+
+        const icons = document.createElement('span');
+        icons.className = 'flex items-center gap-1 flex-shrink-0';
 
         const pendingIcon = document.createElement("span");
-        pendingIcon.className = "pendingIcon ml-1 hidden";
+        pendingIcon.className = "pendingIcon hidden";
         pendingIcon.setAttribute("aria-hidden", "true");
         pendingIcon.textContent = "⏳";
-        btn.appendChild(pendingIcon);
 
         const playIcon = document.createElement("span");
-        playIcon.className = "playIcon ml-1 hidden";
+        playIcon.className = "playIcon hidden";
         playIcon.setAttribute("aria-hidden", "true");
         playIcon.textContent = "▶";
-        btn.appendChild(playIcon);
 
         const okIcon = document.createElement("span");
-        okIcon.className = "okIcon ml-1 hidden text-green-700";
+        okIcon.className = "okIcon hidden text-green-700";
         okIcon.setAttribute("aria-hidden", "true");
         okIcon.textContent = "✓";
-        btn.appendChild(okIcon);
 
         const errorIcon = document.createElement("span");
-        errorIcon.className = "errorIcon ml-1 hidden text-red-600";
+        errorIcon.className = "errorIcon hidden text-red-600";
         errorIcon.setAttribute("aria-hidden", "true");
         errorIcon.textContent = "✕";
-        btn.appendChild(errorIcon);
+
+        icons.appendChild(pendingIcon);
+        icons.appendChild(playIcon);
+        icons.appendChild(okIcon);
+        icons.appendChild(errorIcon);
+
+        row.appendChild(nameSpan);
+        row.appendChild(icons);
 
         const statusText = document.createElement("span");
         statusText.className = "statusText sr-only";
         statusText.textContent = "";
-        btn.appendChild(statusText);
 
-        li.title = item.group;
+        btn.appendChild(row);
+        btn.appendChild(statusText);
 
         // Apply any remembered status for this stream (e.g., show ✓ after switching away).
         const remembered = streamStatusByUri.get(item.uri);
-        if (remembered) setStreamStatus(li, remembered);
+        if (remembered) setStreamStatus(btn, remembered);
 
-        btn.addEventListener("click", () => play(item.uri, li));
+        btn.addEventListener("click", () => play(item.uri, btn));
 
-        li.appendChild(btn);
-        streamList.appendChild(li);
+        streamList.appendChild(btn);
     });
 }
 
 function showPlaceholder() {
     debugLog("Showing placeholder");
-    streamList.innerHTML = '<li class="text-gray-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</li>';
+    streamList.innerHTML = '<div class="text-gray-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</div>';
     currentPlaylist = null;
     updateShareMenuState();
 }
