@@ -615,6 +615,7 @@ function renderList(items) {
         btn.title = item.group;
         btn.className = [
           'streamBtn',
+          'w-full',
           'min-h-16',
           'px-3',
           'py-2',
