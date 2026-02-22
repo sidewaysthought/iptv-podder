@@ -15,88 +15,92 @@ $pageTitle = 'View IPTV';
     </nav>
     <?php include 'partials/header.php'; ?>
     </div>
-    <main class="container mx-auto p-6 max-w-6xl flex-1 min-h-0 flex flex-col">
-        <!-- Header -->
-        <header class="mb-4">
-            <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
-            <p class="text-gray-600 dark:text-gray-300">
-                Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
-                streams and play them on click.
-            </p>
-        </header>
-
-        <!-- Player (top) -->
+    <main class="w-full flex-1 min-h-0 flex flex-col">
+        <!-- Row: page intro -->
         <section class="w-full">
-            <div class="max-w-5xl mx-auto">
-                <div id="playerWrapper" class="relative w-full" style="padding-top: 45%;"> <!-- slightly shorter than 16:9 -->
-                    <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+                <header>
+                    <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
+                    <p class="mt-1 text-gray-600 dark:text-gray-300">
+                        Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
+                        streams and play them on click.
+                    </p>
+                </header>
+            </div>
+        </section>
+
+        <!-- Row: player -->
+        <section class="w-full">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
+                <div class="max-w-5xl mx-auto">
+                    <div id="playerWrapper" class="relative w-full" style="padding-top: 45%;">
+                        <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Scrollable panel (bottom) -->
-        <section id="playlistPanel" class="mt-4 flex-1 min-h-0 border border-gray-300 rounded shadow-sm overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-700">
-            <!-- URL bar + actions (centered row w/ gentle gradient) -->
-            <div class="border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-                <div class="p-3">
-                    <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-center">
-                        <label for="manifestUrl" class="sr-only">Playlist URL</label>
-                        <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
-                            class="flex-1 min-w-0 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
-                        <datalist id="history"></datalist>
-                        <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
-                            Load
+        <!-- Row: controls bar (full width stripe, inset controls) -->
+        <section class="w-full border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+                <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                    <label for="manifestUrl" class="sr-only">Playlist URL</label>
+                    <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
+                        class="flex-1 min-w-0 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
+                    <datalist id="history"></datalist>
+                    <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
+                        Load
+                    </button>
+                    <div class="relative flex items-center z-50 justify-center">
+                        <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
+                                <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span class="sr-only">History</span>
                         </button>
-                        <div class="relative flex items-center z-50 justify-center">
-                            <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
-                                    <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span class="sr-only">History</span>
-                            </button>
-                            <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"></div>
-                        </div>
-                        <div class="relative flex items-center z-50 justify-center">
-                            <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
-                                    <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
-                                    <rect x="5" y="14" width="14" height="6" rx="1" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <span class="sr-only">Share</span>
-                            </button>
-                            <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700">
-                                <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist</button>
-                                <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist &amp; video</button>
-                            </div>
+                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"></div>
+                    </div>
+                    <div class="relative flex items-center z-50 justify-center">
+                        <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
+                                <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
+                                <rect x="5" y="14" width="14" height="6" rx="1" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <span class="sr-only">Share</span>
+                        </button>
+                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700">
+                            <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist</button>
+                            <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist &amp; video</button>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Filter + channels further down -->
-            <div class="p-3">
-                <div id="searchWrap" class="hidden max-w-5xl mx-auto">
+        <!-- Row: playlist browsing (search + scrollable channel grid) -->
+        <section id="playlistPanel" class="w-full flex-1 min-h-0">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col min-h-0">
+                <div id="searchWrap" class="hidden max-w-5xl mx-auto w-full">
                     <label for="searchInput" class="sr-only">Filter channels</label>
                     <input id="searchInput" type="text" placeholder="Filter channels..."
                         class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
                 </div>
-            </div>
 
-            <!-- Streams grid (scrollable) -->
-            <div id="listWrapper" class="flex-1 min-h-0 overflow-y-auto">
-                <div id="streamList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-3 pt-0 max-w-5xl mx-auto"></div>
-            </div>
+                <div id="listWrapper" class="mt-3 flex-1 min-h-0 overflow-y-auto">
+                    <div id="streamList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-w-5xl mx-auto"></div>
+                </div>
 
-            <div class="border-t text-xs text-gray-800 p-3 dark:text-gray-100" aria-label="Stream status legend">
-                <p class="font-semibold">Status legend</p>
-                <ul class="mt-1 space-y-1">
-                    <li><span aria-hidden="true">⏳</span> <span class="sr-only">Loading</span> Loading (trying to play)</li>
-                    <li><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> Playing now</li>
-                    <li><span aria-hidden="true">✓</span> <span class="sr-only">Works</span> Works (played before)</li>
-                    <li><span aria-hidden="true">✕</span> <span class="sr-only">Failed</span> Failed to play</li>
-                </ul>
+                <div class="mt-3 border-t text-xs text-gray-800 pt-3 dark:text-gray-100" aria-label="Stream status legend">
+                    <p class="font-semibold">Status legend</p>
+                    <ul class="mt-1 space-y-1">
+                        <li><span aria-hidden="true">⏳</span> <span class="sr-only">Loading</span> Loading (trying to play)</li>
+                        <li><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> Playing now</li>
+                        <li><span aria-hidden="true">✓</span> <span class="sr-only">Works</span> Works (played before)</li>
+                        <li><span aria-hidden="true">✕</span> <span class="sr-only">Failed</span> Failed to play</li>
+                    </ul>
+                </div>
             </div>
         </section>
     </main>
