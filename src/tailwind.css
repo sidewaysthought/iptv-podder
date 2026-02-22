@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .streamBtn {
+    height: 4rem;
+    min-height: 4rem;
+  }
+}
