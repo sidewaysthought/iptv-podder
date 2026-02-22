@@ -61,6 +61,7 @@ let dashPlayer = null;
 let activeLi = null;
 let activeUri = null;
 let currentPlaylist = null;
+let playSessionId = 0;
 
 let playbackNoticeEl = null;
 function ensurePlaybackNotice() {
@@ -746,6 +747,10 @@ function setStreamStatus(li, status) {
 
 async function play(url, li) {
     debugLog("Playing", url);
+    const sessionId = ++playSessionId;
+
+    const isCurrentSession = () => sessionId === playSessionId;
+
     // If switching streams, mark the previous one as "works" (✓) if it was playing.
     if (activeLi && activeLi !== li) {
         const prev = streamStatusByUri.get(activeUri);
@@ -806,6 +811,7 @@ async function play(url, li) {
     let attemptIndex = 0;
 
     const onLoaded = () => {
+        if (!isCurrentSession()) return;
         updateUrlParams({ program: url });
         video.removeEventListener("error", onError);
         announce(`Playing: ${li?.dataset.label || 'Stream'}`);
@@ -819,6 +825,8 @@ async function play(url, li) {
     };
 
     const onError = (err) => {
+        if (!isCurrentSession()) return;
+
         const kind = attempts[attemptIndex];
         const msg = err?.message || String(err || 'Unknown error');
 
@@ -850,6 +858,8 @@ async function play(url, li) {
     };
 
     const startAttempt = () => {
+        if (!isCurrentSession()) return;
+
         resetPlayer();
 
         const kind = attempts[attemptIndex];
@@ -868,11 +878,15 @@ async function play(url, li) {
         // Mark the stream as actually playing only once media playback really starts.
         // (We don't want to show ▶ while we're still cycling through attempts.)
         const onPlaying = () => {
+            if (!isCurrentSession()) return;
+
             if (activeLi === li && activeUri === url) {
                 setStreamStatus(li, "playing");
 
                 // If playback stops later (paused/ended), keep a visible ✓ to show it worked.
                 const onStopped = () => {
+                    if (!isCurrentSession()) return;
+
                     if (activeLi === li && activeUri === url) {
                         setStreamStatus(li, "ok");
                     }
@@ -952,6 +966,8 @@ async function play(url, li) {
             hls.attachMedia(video);
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
+                if (!isCurrentSession()) return;
+
                 // If segment/key loads fail, it’s often due to CORS or mixed content.
                 // We intentionally do NOT fall back to segment proxying; we fail with a clear reason.
                 const details = data?.details || '';
