@@ -129,9 +129,9 @@ function ensureDebugPanel() {
     'bg-gray-50',
     'border-gray-200',
     'text-gray-800',
-    'dark:bg-gray-900',
-    'dark:border-gray-700',
-    'dark:text-gray-200',
+    'dark:bg-black',
+    'dark:border-gray-500',
+    'dark:text-gray-100',
   ].join(' ');
 
   const header = document.createElement('div');
@@ -143,7 +143,7 @@ function ensureDebugPanel() {
 
   debugCopyBtn = document.createElement('button');
   debugCopyBtn.type = 'button';
-  debugCopyBtn.className = 'px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800';
+  debugCopyBtn.className = 'px-2 py-1 rounded border border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900';
   debugCopyBtn.textContent = 'Copy';
   debugCopyBtn.addEventListener('click', async () => {
     try {
@@ -633,9 +633,9 @@ function renderList(items) {
           'hover:bg-gray-50',
           'focus:outline-none',
           'focus:ring',
-          'dark:bg-gray-900',
-          'dark:border-gray-700',
-          'dark:hover:bg-gray-800',
+          'dark:bg-black',
+          'dark:border-gray-500',
+          'dark:hover:bg-gray-900',
         ].join(' ');
 
         const row = document.createElement('div');
