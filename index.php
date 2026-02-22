@@ -81,16 +81,16 @@ $pageTitle = 'View IPTV';
 
         <!-- Row: playlist browsing (search + scrollable channel grid) -->
         <section id="playlistPanel" class="w-full flex-1 min-h-0">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col min-h-0">
+            <div class="w-full px-4 sm:px-6 py-4 flex flex-col min-h-0">
                 <!-- Filter UI can be re-enabled later; keep DOM element for JS but hide it for now. -->
-                <div id="searchWrap" class="hidden max-w-5xl mx-auto w-full" hidden>
+                <div id="searchWrap" class="hidden w-full" hidden>
                     <label for="searchInput" class="sr-only">Filter channels</label>
                     <input id="searchInput" type="text" placeholder="Filter channels..."
                         class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
                 </div>
 
                 <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto">
-                    <div id="streamList" class="grid gap-2 w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"></div>
+                    <div id="streamList" class="grid gap-3 w-full" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); justify-items: stretch;"></div>
                 </div>
 
                 <div class="mt-3 border-t text-xs text-gray-800 pt-3 dark:text-gray-100" aria-label="Stream status legend">
