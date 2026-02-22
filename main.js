@@ -127,11 +127,11 @@ function ensureDebugPanel() {
     'border',
     'text-xs',
     'bg-gradient-to-r',
-    'from-white',
-    'via-sky-50',
-    'to-blue-100',
-    'border-sky-200',
-    'text-slate-700',
+    'from-slate-100',
+    'via-sky-100',
+    'to-blue-200',
+    'border-sky-300',
+    'text-slate-800',
     'dark:bg-black',
     'dark:border-gray-500',
     'dark:text-gray-100',
@@ -146,7 +146,7 @@ function ensureDebugPanel() {
 
   debugCopyBtn = document.createElement('button');
   debugCopyBtn.type = 'button';
-  debugCopyBtn.className = 'px-2 py-1 rounded border border-sky-200 bg-gradient-to-r from-white via-sky-50 to-blue-100 text-slate-800 hover:from-sky-50 hover:to-blue-200 dark:border-gray-500 dark:bg-black dark:text-gray-100 dark:hover:bg-gray-900';
+  debugCopyBtn.className = 'px-2 py-1 rounded border border-sky-300 bg-gradient-to-r from-slate-100 via-sky-100 to-blue-200 text-slate-900 hover:from-sky-200 hover:to-blue-300 dark:border-gray-500 dark:bg-black dark:text-gray-100 dark:hover:bg-gray-900';
   debugCopyBtn.textContent = 'Copy';
   debugCopyBtn.addEventListener('click', async () => {
     try {
@@ -240,7 +240,7 @@ function populateHistory() {
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.role = "menuitem";
-                btn.className = "block w-full text-left px-2 py-1 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800 break-all";
+                btn.className = "block w-full text-left px-2 py-1 text-slate-900 hover:bg-sky-200/70 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800 break-all";
                 btn.textContent = u;
                 btn.addEventListener("click", () => {
                     manifestInput.value = u;
@@ -627,17 +627,17 @@ function renderList(items) {
           'cursor-pointer',
           'rounded',
           'border',
-          'border-sky-200',
+          'border-sky-300',
           'bg-gradient-to-r',
-          'from-white',
-          'via-sky-50',
-          'to-blue-100',
+          'from-slate-100',
+          'via-sky-100',
+          'to-blue-200',
           // even sizing
           'h-16',
 
           'shadow-sm',
-          'hover:from-sky-50',
-          'hover:to-blue-200',
+          'hover:from-sky-200',
+          'hover:to-blue-300',
           'focus:outline-none',
           'focus:ring',
           'dark:bg-black',
@@ -649,7 +649,7 @@ function renderList(items) {
         row.className = 'h-full flex items-center justify-between gap-2';
 
         const nameSpan = document.createElement("span");
-        nameSpan.className = 'font-medium text-slate-700 dark:text-blue-300 break-words overflow-hidden';
+        nameSpan.className = 'font-medium text-slate-800 dark:text-blue-300 break-words overflow-hidden';
         nameSpan.textContent = item.label || `Stream ${idx + 1}`;
 
         const icons = document.createElement('span');
