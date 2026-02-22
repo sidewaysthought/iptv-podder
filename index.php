@@ -1,4 +1,15 @@
 <?php
+$https_on_for_cookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['SERVER_PORT'] ?? 0) == 443)
+    || (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $https_on_for_cookie,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 session_start();
 $_SESSION['user_active'] = true;
 $pageTitle = 'View IPTV';
