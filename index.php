@@ -34,7 +34,7 @@ $pageTitle = 'View IPTV';
     </nav>
     <?php include 'partials/header.php'; ?>
     </div>
-    <main class="w-full flex-1 min-h-0 flex flex-col">
+    <main class="w-full flex-1 min-h-0 flex flex-col pb-20">
 
         <!-- Row: player -->
         <section class="w-full">
@@ -49,7 +49,7 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: controls bar (full width stripe, inset controls) -->
-        <section class="w-full border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <section class="w-full sticky top-0 z-30 border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
                 <h2 id="playlistControlsHeading" class="sr-only">Playlist controls</h2>
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
@@ -108,7 +108,7 @@ $pageTitle = 'View IPTV';
                         class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
                 </div>
 
-                <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto">
+                <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto pb-4">
                     <div id="streamList" class="grid gap-3 w-full mx-auto" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 220px)); justify-content: center; gap: 0.75rem; max-width: calc((220px * 6) + (0.75rem * 5));"></div>
                 </div>
             </div>

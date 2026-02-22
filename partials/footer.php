@@ -1,4 +1,4 @@
-<footer class="bg-gray-200 py-4 mt-auto dark:bg-gray-900">
+<footer class="fixed inset-x-0 bottom-0 z-40 bg-gray-200 py-4 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700">
     <div class="mx-auto flex w-full max-w-6xl items-center px-4">
         <div class="flex-1 text-left font-semibold text-gray-900 dark:text-gray-100">View-IPTV.stream</div>
         <div class="flex-1 text-center text-gray-900 dark:text-gray-100">Copyright &copy; 2026 Sideways Thought LLC.</div>
