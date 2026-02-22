@@ -4,7 +4,7 @@
 ?>
 <div
   id="consentBanner"
-  class="hidden fixed inset-x-0 bottom-0 z-50 border-t border-gray-300 bg-white text-gray-900"
+  class="hidden fixed inset-x-0 bottom-0 z-50 border-t border-sky-200 bg-gradient-to-r from-white via-sky-50 to-blue-100 text-slate-800 shadow-[0_-1px_0_rgba(148,163,184,0.35)]"
   role="region"
   aria-label="Privacy options"
 >
@@ -13,7 +13,7 @@
       <p class="font-semibold">Privacy notice</p>
       <p>
         We use analytics to understand site usage. You can accept or reject analytics cookies.
-        See our <a class="text-blue-700 underline hover:no-underline" href="privacy.php">Privacy Policy</a>.
+        See our <a class="text-slate-700 underline hover:no-underline" href="privacy.php">Privacy Policy</a>.
       </p>
     </div>
 
@@ -21,14 +21,14 @@
       <button
         id="consentReject"
         type="button"
-        class="px-3 py-2 border border-gray-400 rounded bg-white hover:bg-gray-50 focus:outline-none focus:ring"
+        class="px-3 py-2 border border-slate-300 rounded bg-white text-gray-800 hover:bg-slate-100 focus:outline-none focus:ring"
       >
         Reject
       </button>
       <button
         id="consentAccept"
         type="button"
-        class="px-3 py-2 rounded bg-blue-700 text-white hover:bg-blue-800 focus:outline-none focus:ring"
+        class="px-3 py-2 rounded border border-slate-300 bg-white text-gray-800 hover:bg-slate-100 focus:outline-none focus:ring"
       >
         Accept
       </button>

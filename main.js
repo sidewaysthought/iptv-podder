@@ -126,9 +126,12 @@ function ensureDebugPanel() {
     'rounded',
     'border',
     'text-xs',
-    'bg-gray-50',
-    'border-gray-200',
-    'text-gray-800',
+    'bg-gradient-to-r',
+    'from-white',
+    'via-sky-50',
+    'to-blue-100',
+    'border-sky-200',
+    'text-slate-700',
     'dark:bg-black',
     'dark:border-gray-500',
     'dark:text-gray-100',
@@ -143,7 +146,7 @@ function ensureDebugPanel() {
 
   debugCopyBtn = document.createElement('button');
   debugCopyBtn.type = 'button';
-  debugCopyBtn.className = 'px-2 py-1 rounded border border-gray-300 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900';
+  debugCopyBtn.className = 'px-2 py-1 rounded border border-slate-300 bg-white text-gray-800 dark:border-gray-500 hover:bg-slate-100 dark:hover:bg-gray-900';
   debugCopyBtn.textContent = 'Copy';
   debugCopyBtn.addEventListener('click', async () => {
     try {
@@ -229,7 +232,7 @@ function populateHistory() {
         if (!history.length) {
             const span = document.createElement("span");
             span.textContent = "No history";
-            span.className = "block px-2 py-1 text-gray-500 dark:text-gray-400";
+            span.className = "block px-2 py-1 text-slate-500 dark:text-gray-400";
             span.role = "none";
             historyMenu.appendChild(span);
         } else {
@@ -237,7 +240,7 @@ function populateHistory() {
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.role = "menuitem";
-                btn.className = "block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800 break-all";
+                btn.className = "block w-full text-left px-2 py-1 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-800 break-all";
                 btn.textContent = u;
                 btn.addEventListener("click", () => {
                     manifestInput.value = u;
@@ -624,13 +627,13 @@ function renderList(items) {
           'cursor-pointer',
           'rounded',
           'border',
-          'border-gray-200',
+          'border-sky-200',
           'bg-white',
           // even sizing
           'h-16',
 
           'shadow-sm',
-          'hover:bg-gray-50',
+          'hover:bg-sky-50',
           'focus:outline-none',
           'focus:ring',
           'dark:bg-black',
@@ -642,7 +645,7 @@ function renderList(items) {
         row.className = 'h-full flex items-center justify-between gap-2';
 
         const nameSpan = document.createElement("span");
-        nameSpan.className = 'font-medium text-blue-700 dark:text-blue-300 break-words overflow-hidden';
+        nameSpan.className = 'font-medium text-slate-700 dark:text-blue-300 break-words overflow-hidden';
         nameSpan.textContent = item.label || `Stream ${idx + 1}`;
 
         const icons = document.createElement('span');
@@ -712,7 +715,7 @@ function renderList(items) {
 
 function showPlaceholder() {
     debugLog("Showing placeholder");
-    streamList.innerHTML = '<div class="text-gray-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</div>';
+    streamList.innerHTML = '<div class="text-slate-500">No playlist loaded. Paste a URL above and click <strong>Load</strong>.</div>';
     currentPlaylist = null;
     updateShareMenuState();
 }
