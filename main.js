@@ -241,7 +241,7 @@ function populateHistory() {
                 btn.addEventListener("click", () => {
                     manifestInput.value = u;
                     hideHistoryMenu();
-                    manifestInput.focus();
+                    fetchAndRender();
                 });
                 historyMenu.appendChild(btn);
             });
@@ -1067,4 +1067,3 @@ function doShare(url) {
     prompt("Copy this link:", url);
   }
 }
-
