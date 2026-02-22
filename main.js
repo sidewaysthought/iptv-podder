@@ -199,28 +199,6 @@ const video = document.getElementById("videoPlayer");
 const playlistContainer = document.getElementById("playlistContainer");
 const playerWrapper = document.getElementById("playerWrapper");
 
-function syncFixedLayoutOffsets() {
-  const root = document.documentElement;
-  const siteHeader = document.querySelector('header');
-  const playerRow = document.getElementById('fixedPlayerRow');
-  if (!root || !siteHeader || !playerRow) return;
-
-  root.style.setProperty('--site-header-height', `${Math.ceil(siteHeader.offsetHeight)}px`);
-  root.style.setProperty('--site-player-height', `${Math.ceil(playerRow.offsetHeight)}px`);
-}
-
-syncFixedLayoutOffsets();
-window.addEventListener('resize', syncFixedLayoutOffsets);
-window.addEventListener('load', syncFixedLayoutOffsets);
-
-if ('ResizeObserver' in window) {
-  const siteHeader = document.querySelector('header');
-  const playerRow = document.getElementById('fixedPlayerRow');
-  const ro = new ResizeObserver(() => syncFixedLayoutOffsets());
-  if (siteHeader) ro.observe(siteHeader);
-  if (playerRow) ro.observe(playerRow);
-}
-
 const HISTORY_KEY = "history";
 
 function loadHistory() {

@@ -53,7 +53,7 @@ $pageTitle = 'View IPTV';
 
         <!-- Row: player -->
         <section id="fixedPlayerRow" class="fixed inset-x-0 z-40 w-full bg-gray-100 dark:bg-black">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6">
                 <h2 id="playerHeading" class="sr-only">Video player</h2>
                 <div class="max-w-5xl mx-auto">
                     <div id="playerWrapper" class="relative w-full" style="padding-top: 45%;">
@@ -64,7 +64,7 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: controls bar (full width stripe, inset controls) -->
-        <section class="w-full border-y border-gray-200 dark:border-gray-500 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <section class="relative z-10 w-full border-y border-gray-200 dark:border-gray-500 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
                 <h2 id="playlistControlsHeading" class="sr-only">Playlist controls</h2>
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
