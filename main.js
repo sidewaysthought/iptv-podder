@@ -481,13 +481,15 @@ shareVideoBtn.addEventListener("click", () => {
   hideShareMenu();
 });
 
-searchInput.addEventListener("input", () => {
-    const term = searchInput.value.trim().toLowerCase();
-    debugLog("Filtering", term);
-    [...streamList.children].forEach((el) => {
-        el.classList.toggle("hidden", !el.dataset.label?.toLowerCase().includes(term));
-    });
-});
+if (searchInput) {
+  searchInput.addEventListener("input", () => {
+      const term = searchInput.value.trim().toLowerCase();
+      debugLog("Filtering", term);
+      [...streamList.children].forEach((el) => {
+          el.classList.toggle("hidden", !el.dataset.label?.toLowerCase().includes(term));
+      });
+  });
+}
 
 // Show placeholder on first load
 debugLog("Initial placeholder");
