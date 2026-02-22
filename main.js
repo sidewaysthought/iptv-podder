@@ -824,6 +824,8 @@ async function play(url, li) {
         return e;
     };
 
+    let activeAttemptId = 0;
+
     const onError = (err) => {
         if (!isCurrentSession()) return;
 
@@ -847,6 +849,7 @@ async function play(url, li) {
         video.removeEventListener("loadedmetadata", onLoaded);
         attemptIndex++;
         if (attemptIndex < attempts.length) {
+            setStreamStatus(li, "pending");
             startAttempt();
         } else {
             setStreamStatus(li, "failed");
@@ -872,8 +875,14 @@ async function play(url, li) {
           note: 'Proxy is allowed for .m3u8 retrieval only; media segments are never proxied.',
         });
 
+        const attemptId = ++activeAttemptId;
+        const handleAttemptError = (err) => {
+            if (attemptId !== activeAttemptId) return;
+            onError(err);
+        };
+
         video.addEventListener("loadedmetadata", onLoaded, { once: true });
-        video.addEventListener("error", onError, { once: true });
+        video.addEventListener("error", handleAttemptError, { once: true });
 
         // Mark the stream as actually playing only once media playback really starts.
         // (We don't want to show ▶ while we're still cycling through attempts.)
@@ -899,7 +908,7 @@ async function play(url, li) {
 
         if (kind === "hls") {
             if (!Hls.isSupported()) {
-                return onError(new Error("HLS not supported"));
+                return handleAttemptError(new Error("HLS not supported"));
             }
             // Enforce playlist-only proxying. We proxy .m3u8 retrieval (manifest + level playlists)
             // but we never proxy fragments/keys/media bytes.
@@ -926,7 +935,7 @@ async function play(url, li) {
               // Byte-range streams (CMAF/fMP4 byterange) often require Range support to be reliable.
               const hasByteRange = fragments.some((f) => !!(f?.byteRange || f?.rawByteRange));
               if (hasByteRange) {
-                return onError(makePolicyError(
+                return handleAttemptError(makePolicyError(
                   'HLS_BYTERANGE',
                   'This HLS stream uses byte-range segments (EXT-X-BYTERANGE). Playlist-only proxy mode is enforced, and we do not proxy media bytes. This stream is not supported here.'
                 ));
@@ -936,7 +945,7 @@ async function play(url, li) {
               const pageIsHttps = window.location.protocol === 'https:';
               const hasHttpFrag = pageIsHttps && fragments.some((f) => typeof f?.url === 'string' && f.url.startsWith('http://'));
               if (hasHttpFrag) {
-                return onError(makePolicyError(
+                return handleAttemptError(makePolicyError(
                   'MIXED_CONTENT',
                   'This stream serves media over http://. Your browser blocks mixed content on https:// pages, and we do not proxy segments. This stream is not supported here.'
                 ));
@@ -949,13 +958,13 @@ async function play(url, li) {
               const hasKey = keyUris.length > 0;
               const hasHttpKey = pageIsHttps && keyUris.some((u) => u.startsWith('http://'));
               if (hasKey) {
-                return onError(makePolicyError(
+                return handleAttemptError(makePolicyError(
                   'HLS_ENCRYPTED',
                   'This HLS stream appears to be encrypted (EXT-X-KEY). Playlist-only proxy mode is enforced and keys are not proxied, so playback may be blocked by CORS/security policy. This stream is not supported here.'
                 ));
               }
               if (hasHttpKey) {
-                return onError(makePolicyError(
+                return handleAttemptError(makePolicyError(
                   'HLS_KEY_HTTP',
                   'This HLS stream uses an http:// key URI. Mixed content is blocked on https:// pages and we do not proxy media bytes. This stream is not supported here.'
                 ));
@@ -972,31 +981,31 @@ async function play(url, li) {
                 // We intentionally do NOT fall back to segment proxying; we fail with a clear reason.
                 const details = data?.details || '';
                 if (details === Hls.ErrorDetails.FRAG_LOAD_ERROR || details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
-                  return onError(makePolicyError(
+                  return handleAttemptError(makePolicyError(
                     'SEGMENT_BLOCKED',
                     'This stream’s media segment requests are failing (often due to CORS or mixed content). This site proxies playlists only (not segments) to control bandwidth cost, so this stream cannot be played here.'
                   ));
                 }
                 if (details === Hls.ErrorDetails.KEY_LOAD_ERROR || details === Hls.ErrorDetails.KEY_LOAD_TIMEOUT) {
-                  return onError(makePolicyError(
+                  return handleAttemptError(makePolicyError(
                     'KEY_BLOCKED',
                     'This stream requires fetching encryption keys, but key requests are failing (often due to CORS). This site proxies playlists only (not keys/segments), so this stream cannot be played here.'
                   ));
                 }
                 if (data?.fatal) {
-                  onError(new Error(details || 'HLS fatal error'));
+                  handleAttemptError(new Error(details || 'HLS fatal error'));
                 }
             });
         } else if (kind === "dash") {
             if (!hasDash) {
-                return onError(new Error("dash.js not available"));
+                return handleAttemptError(new Error("dash.js not available"));
             }
             dashPlayer = dashjs.MediaPlayer().create();
             let dashErrored = false;
             const handleDashError = (e) => {
                 if (dashErrored) return;
                 dashErrored = true;
-                onError(new Error(e?.event?.message || e?.message || "DASH fatal error"));
+                handleAttemptError(new Error(e?.event?.message || e?.message || "DASH fatal error"));
             };
             dashPlayer.on(dashjs.MediaPlayer.events.ERROR, handleDashError);
             // Do not proxy DASH manifests: relative segment URLs would resolve against proxy.php,
@@ -1006,7 +1015,7 @@ async function play(url, li) {
             // Native playback attempt is direct. If the URL is http:// on an https:// page,
             // the browser will block it (mixed content) and we do not proxy segments.
             if (window.location.protocol === 'https:' && /^http:\/\//i.test(url)) {
-              return onError(makePolicyError(
+              return handleAttemptError(makePolicyError(
                 'MIXED_CONTENT',
                 'This stream is http://. Browsers block mixed content on https:// pages, and this site does not proxy media segments. This stream is not supported here.'
               ));
@@ -1014,7 +1023,7 @@ async function play(url, li) {
             video.src = url;
         }
 
-        video.play().catch(onError);
+        video.play().catch(handleAttemptError);
     };
 
     // Make status immediately obvious while we cycle through methods.
