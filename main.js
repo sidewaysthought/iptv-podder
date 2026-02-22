@@ -13,28 +13,43 @@ function proxifyUrl(url) {
   return `proxy.php?url=${encodeURIComponent(url)}`;
 }
 
-// Hls.js loader that routes all manifest/segment/key requests through the PHP proxy.
-// This is necessary for providers that set restrictive CORS headers (e.g. Pluto).
-class ProxyLoader extends Hls.DefaultConfig.loader {
+function isLikelyPlaylistUrl(url) {
+  return /\.m3u8($|\?)/i.test(url);
+}
+
+// Hls.js loader that routes PLAYLIST requests through the PHP proxy.
+// Important: we do NOT proxy media segments (bandwidth/cost). If a stream requires
+// segment proxying to play due to CORS/mixed-content/byterange behavior, we fail fast.
+class PlaylistProxyLoader extends Hls.DefaultConfig.loader {
   load(context, config, callbacks) {
     const origUrl = context.url;
-    const nextContext = { ...context, url: proxifyUrl(origUrl) };
+    const ctxType = context?.type;
+
+    // Only proxy manifest/playlist-like loads.
+    // Hls.js context.type commonly includes: manifest, level, audioTrack, subtitleTrack, fragment, key.
+    const shouldProxy =
+      (ctxType === 'manifest' || ctxType === 'level' || ctxType === 'audioTrack' || ctxType === 'subtitleTrack') &&
+      isLikelyPlaylistUrl(origUrl);
+
+    const nextContext = shouldProxy
+      ? { ...context, url: proxifyUrl(origUrl) }
+      : context;
 
     const wrappedCallbacks = {
       ...callbacks,
       onSuccess: (response, stats, ctx, networkDetails) => {
         // Make hls.js treat the response as if it came from the original URL.
         // This preserves base URL resolution for relative URIs in playlists.
-        if (response && typeof response === 'object') {
+        if (shouldProxy && response && typeof response === 'object') {
           response.url = origUrl;
         }
-        callbacks.onSuccess(response, stats, { ...ctx, url: origUrl }, networkDetails);
+        callbacks.onSuccess(response, stats, shouldProxy ? { ...ctx, url: origUrl } : ctx, networkDetails);
       },
       onError: (error, ctx, networkDetails) => {
-        callbacks.onError(error, { ...ctx, url: origUrl }, networkDetails);
+        callbacks.onError(error, shouldProxy ? { ...ctx, url: origUrl } : ctx, networkDetails);
       },
       onTimeout: (stats, ctx, networkDetails) => {
-        callbacks.onTimeout(stats, { ...ctx, url: origUrl }, networkDetails);
+        callbacks.onTimeout(stats, shouldProxy ? { ...ctx, url: origUrl } : ctx, networkDetails);
       },
     };
 
@@ -47,15 +62,123 @@ let activeLi = null;
 let activeUri = null;
 let currentPlaylist = null;
 
+let playbackNoticeEl = null;
+function ensurePlaybackNotice() {
+  if (playbackNoticeEl) return;
+  playbackNoticeEl = document.createElement('div');
+  playbackNoticeEl.id = 'playbackNotice';
+  playbackNoticeEl.className = [
+    'mt-2',
+    'p-2',
+    'rounded',
+    'border',
+    'text-sm',
+    'hidden',
+    'bg-yellow-50',
+    'border-yellow-200',
+    'text-yellow-900',
+    'dark:bg-yellow-950',
+    'dark:border-yellow-900',
+    'dark:text-yellow-100',
+  ].join(' ');
+
+  const mount = document.getElementById('playerWrapper') || document.body;
+  mount.appendChild(playbackNoticeEl);
+}
+
+function clearPlaybackNotice() {
+  ensurePlaybackNotice();
+  playbackNoticeEl.textContent = '';
+  playbackNoticeEl.classList.add('hidden');
+}
+
+function showPlaybackNotice(msg) {
+  ensurePlaybackNotice();
+  playbackNoticeEl.textContent = msg;
+  playbackNoticeEl.classList.remove('hidden');
+}
+
 // Track the last known status of each stream so we can show a persistent checkmark
 // even after switching away.
 // status: 'untested' | 'pending' | 'playing' | 'ok' | 'failed'
 const streamStatusByUri = new Map();
 
-// Enable verbose logging when ?debug is present in the URL
+// Enable debug UI/logging when ?debug is present in the URL
 const DEBUG = new URLSearchParams(window.location.search).has("debug");
 function debugLog(...args) {
   if (DEBUG) console.log("[DEBUG]", ...args);
+}
+
+let debugPanel = null;
+let debugCopyBtn = null;
+let debugTextEl = null;
+
+function ensureDebugPanel() {
+  if (!DEBUG) return;
+  if (debugPanel) return;
+
+  debugPanel = document.createElement('div');
+  debugPanel.id = 'debugPanel';
+  debugPanel.className = [
+    'mt-2',
+    'p-2',
+    'rounded',
+    'border',
+    'text-xs',
+    'bg-gray-50',
+    'border-gray-200',
+    'text-gray-800',
+    'dark:bg-gray-900',
+    'dark:border-gray-700',
+    'dark:text-gray-200',
+  ].join(' ');
+
+  const header = document.createElement('div');
+  header.className = 'flex items-center justify-between gap-2';
+
+  const title = document.createElement('div');
+  title.className = 'font-semibold';
+  title.textContent = 'Debug (client)';
+
+  debugCopyBtn = document.createElement('button');
+  debugCopyBtn.type = 'button';
+  debugCopyBtn.className = 'px-2 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800';
+  debugCopyBtn.textContent = 'Copy';
+  debugCopyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(debugTextEl?.textContent || '');
+      debugCopyBtn.textContent = 'Copied';
+      setTimeout(() => (debugCopyBtn.textContent = 'Copy'), 900);
+    } catch {
+      // Fallback
+      prompt('Copy debug info:', debugTextEl?.textContent || '');
+    }
+  });
+
+  header.appendChild(title);
+  header.appendChild(debugCopyBtn);
+
+  debugTextEl = document.createElement('pre');
+  debugTextEl.className = 'mt-2 whitespace-pre-wrap break-words';
+  debugTextEl.textContent = 'Playback: (not started)';
+
+  debugPanel.appendChild(header);
+  debugPanel.appendChild(debugTextEl);
+
+  // Prefer to mount under the player wrapper if present.
+  const mount = document.getElementById('playerWrapper') || document.body;
+  mount.appendChild(debugPanel);
+}
+
+function setDebugInfo(info) {
+  if (!DEBUG) return;
+  ensureDebugPanel();
+
+  const lines = [];
+  for (const [k, v] of Object.entries(info || {})) {
+    lines.push(`${k}: ${v}`);
+  }
+  debugTextEl.textContent = lines.join('\n');
 }
 
 const shareBtn = document.getElementById("shareBtn");
@@ -613,6 +736,7 @@ async function play(url, li) {
             dashPlayer.reset();
             dashPlayer = null;
         }
+        clearPlaybackNotice();
         video.pause();
         video.removeAttribute("src");
         video.load();
@@ -655,8 +779,31 @@ async function play(url, li) {
         announce(`Playing: ${li?.dataset.label || 'Stream'}`);
     };
 
+    const makePolicyError = (code, message) => {
+        const e = new Error(message);
+        e.__policy = true;
+        e.__code = code;
+        return e;
+    };
+
     const onError = (err) => {
-        debugLog("Playback failed", attempts[attemptIndex], err?.message || err);
+        const kind = attempts[attemptIndex];
+        const msg = err?.message || String(err || 'Unknown error');
+
+        debugLog("Playback failed", kind, msg);
+
+        setDebugInfo({
+          playback_engine: kind,
+          proxy_policy: 'playlist-only',
+          result: 'error',
+          error: msg,
+        });
+
+        // If this is a hard policy restriction, show a user-visible explanation.
+        if (err && err.__policy) {
+          showPlaybackNotice(msg);
+        }
+
         video.removeEventListener("loadedmetadata", onLoaded);
         attemptIndex++;
         if (attemptIndex < attempts.length) {
@@ -664,6 +811,9 @@ async function play(url, li) {
         } else {
             setStreamStatus(li, "failed");
             announce(`Playback error: ${li?.dataset.label || 'Stream'}`);
+            if (!err?.__policy) {
+              showPlaybackNotice('Playback failed. Try another stream or enable ?debug=1 for details.');
+            }
         }
     };
 
@@ -672,6 +822,13 @@ async function play(url, li) {
 
         const kind = attempts[attemptIndex];
         debugLog("Attempting playback via", kind);
+
+        setDebugInfo({
+          playback_engine: kind,
+          proxy_policy: 'playlist-only',
+          url: url,
+          note: 'Proxy is allowed for .m3u8 retrieval only; media segments are never proxied.',
+        });
 
         video.addEventListener("loadedmetadata", onLoaded, { once: true });
         video.addEventListener("error", onError, { once: true });
@@ -698,37 +855,89 @@ async function play(url, li) {
             if (!Hls.isSupported()) {
                 return onError(new Error("HLS not supported"));
             }
+            // Enforce playlist-only proxying. We proxy .m3u8 retrieval (manifest + level playlists)
+            // but we never proxy fragments/keys/media bytes.
             hls = new Hls({
-                // hls.js uses different loaders for playlist vs fragments in some versions.
-                // Set all of them to ensure *everything* goes through the PHP proxy.
-                loader: ProxyLoader,
-                pLoader: ProxyLoader,
-                fLoader: ProxyLoader,
-                // Belt-and-suspenders: force any XHR-based loads through the proxy,
-                // even if a particular hls.js build bypasses custom loaders.
-                xhrSetup: (xhr, u) => {
-                    try { xhr.withCredentials = false; } catch {}
-                    // Avoid double-proxying if a loader already rewrote the URL.
-                    if (!isAlreadyProxied(u)) {
-                        try { xhr.open('GET', proxifyUrl(u), true); } catch {}
-                    }
-                },
-                // For fetch-loader paths in newer hls.js
-                fetchSetup: (context, init) => {
-                    const u = context?.url;
-                    if (isAlreadyProxied(u)) {
-                        return new Request(u, { ...init, credentials: 'omit' });
-                    }
-                    return new Request(proxifyUrl(u), {
-                        ...init,
-                        credentials: 'omit',
-                    });
-                },
+                loader: PlaylistProxyLoader,
+                pLoader: PlaylistProxyLoader,
+                // fLoader intentionally left as default (direct segment fetch)
             });
+
+            hls.on(Hls.Events.MANIFEST_LOADED, (_evt, data) => {
+              setDebugInfo({
+                playback_engine: 'hls.js',
+                proxy_policy: 'playlist-only',
+                manifest: 'loaded',
+                levels: data?.levels?.length ?? 'unknown',
+              });
+            });
+
+            // Policy guards after we have a level playlist and resolved fragment URLs.
+            hls.on(Hls.Events.LEVEL_LOADED, (_evt, data) => {
+              const details = data?.details;
+              const fragments = details?.fragments || [];
+
+              // Byte-range streams (CMAF/fMP4 byterange) often require Range support to be reliable.
+              const hasByteRange = fragments.some((f) => !!(f?.byteRange || f?.rawByteRange));
+              if (hasByteRange) {
+                return onError(makePolicyError(
+                  'HLS_BYTERANGE',
+                  'This HLS stream uses byte-range segments (EXT-X-BYTERANGE). Playlist-only proxy mode is enforced, and we do not proxy media bytes. This stream is not supported here.'
+                ));
+              }
+
+              // Mixed content: if any fragment URL is http:// while this page is https://, the browser will block it.
+              const pageIsHttps = window.location.protocol === 'https:';
+              const hasHttpFrag = pageIsHttps && fragments.some((f) => typeof f?.url === 'string' && f.url.startsWith('http://'));
+              if (hasHttpFrag) {
+                return onError(makePolicyError(
+                  'MIXED_CONTENT',
+                  'This stream serves media over http://. Your browser blocks mixed content on https:// pages, and we do not proxy segments. This stream is not supported here.'
+                ));
+              }
+
+              // Key fetches are also media-path; in playlist-only mode we don’t proxy them.
+              const keyUris = fragments
+                .map((f) => f?.decryptdata?.uri)
+                .filter((u) => typeof u === 'string' && u.length);
+              const hasKey = keyUris.length > 0;
+              const hasHttpKey = pageIsHttps && keyUris.some((u) => u.startsWith('http://'));
+              if (hasKey) {
+                return onError(makePolicyError(
+                  'HLS_ENCRYPTED',
+                  'This HLS stream appears to be encrypted (EXT-X-KEY). Playlist-only proxy mode is enforced and keys are not proxied, so playback may be blocked by CORS/security policy. This stream is not supported here.'
+                ));
+              }
+              if (hasHttpKey) {
+                return onError(makePolicyError(
+                  'HLS_KEY_HTTP',
+                  'This HLS stream uses an http:// key URI. Mixed content is blocked on https:// pages and we do not proxy media bytes. This stream is not supported here.'
+                ));
+              }
+            });
+
             hls.loadSource(url);
             hls.attachMedia(video);
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                if (data.fatal) onError(new Error(data.details || "HLS fatal error"));
+
+            hls.on(Hls.Events.ERROR, (_event, data) => {
+                // If segment/key loads fail, it’s often due to CORS or mixed content.
+                // We intentionally do NOT fall back to segment proxying; we fail with a clear reason.
+                const details = data?.details || '';
+                if (details === Hls.ErrorDetails.FRAG_LOAD_ERROR || details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                  return onError(makePolicyError(
+                    'SEGMENT_BLOCKED',
+                    'This stream’s media segment requests are failing (often due to CORS or mixed content). This site proxies playlists only (not segments) to control bandwidth cost, so this stream cannot be played here.'
+                  ));
+                }
+                if (details === Hls.ErrorDetails.KEY_LOAD_ERROR || details === Hls.ErrorDetails.KEY_LOAD_TIMEOUT) {
+                  return onError(makePolicyError(
+                    'KEY_BLOCKED',
+                    'This stream requires fetching encryption keys, but key requests are failing (often due to CORS). This site proxies playlists only (not keys/segments), so this stream cannot be played here.'
+                  ));
+                }
+                if (data?.fatal) {
+                  onError(new Error(details || 'HLS fatal error'));
+                }
             });
         } else if (kind === "dash") {
             if (!hasDash) {
@@ -742,10 +951,19 @@ async function play(url, li) {
                 onError(new Error(e?.event?.message || e?.message || "DASH fatal error"));
             };
             dashPlayer.on(dashjs.MediaPlayer.events.ERROR, handleDashError);
-            dashPlayer.initialize(video, proxifyUrl(url), true);
+            // Do not proxy DASH manifests: relative segment URLs would resolve against proxy.php,
+            // and we do not proxy media bytes.
+            dashPlayer.initialize(video, url, true);
         } else {
-            // Native playback attempt should also go through the proxy to avoid CORS.
-            video.src = proxifyUrl(url);
+            // Native playback attempt is direct. If the URL is http:// on an https:// page,
+            // the browser will block it (mixed content) and we do not proxy segments.
+            if (window.location.protocol === 'https:' && /^http:\/\//i.test(url)) {
+              return onError(makePolicyError(
+                'MIXED_CONTENT',
+                'This stream is http://. Browsers block mixed content on https:// pages, and this site does not proxy media segments. This stream is not supported here.'
+              ));
+            }
+            video.src = url;
         }
 
         video.play().catch(onError);
