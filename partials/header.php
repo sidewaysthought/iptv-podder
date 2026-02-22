@@ -9,7 +9,7 @@
               <button
                 id="settingsBtn"
                 type="button"
-                class="px-2 py-1 rounded text-slate-700 hover:bg-sky-100 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-900"
+                class="px-2 py-1 rounded border border-sky-200 bg-gradient-to-r from-white via-sky-50 to-blue-100 text-slate-700 hover:from-sky-50 hover:to-blue-200 focus:outline-none focus:ring dark:border-gray-500 dark:bg-black dark:text-gray-100 dark:hover:bg-gray-900"
                 aria-haspopup="menu"
                 aria-controls="settingsMenu"
                 aria-expanded="false"
@@ -22,12 +22,12 @@
                 id="settingsMenu"
                 role="menu"
                 aria-label="Settings"
-                class="absolute right-0 top-full mt-2 w-56 bg-white border border-sky-200 rounded shadow hidden z-50 max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"
+                class="absolute right-0 top-full mt-2 w-56 bg-gradient-to-b from-white via-sky-50 to-blue-100 border border-sky-200 rounded shadow hidden z-50 max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"
               >
                 <div class="px-3 py-2 text-xs font-semibold text-slate-600 dark:text-gray-300">Theme</div>
-                <button role="menuitemradio" aria-checked="false" data-theme="system" class="block w-full text-left px-3 py-2 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring dark:hover:bg-gray-900">System</button>
-                <button role="menuitemradio" aria-checked="false" data-theme="dark" class="block w-full text-left px-3 py-2 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring dark:hover:bg-gray-900">Dark</button>
-                <button role="menuitemradio" aria-checked="false" data-theme="light" class="block w-full text-left px-3 py-2 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring dark:hover:bg-gray-900">Light</button>
+                <button role="menuitemradio" aria-checked="false" data-theme="system" class="block w-full text-left px-3 py-2 text-slate-800 hover:bg-blue-100/60 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-900">System</button>
+                <button role="menuitemradio" aria-checked="false" data-theme="dark" class="block w-full text-left px-3 py-2 text-slate-800 hover:bg-blue-100/60 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-900">Dark</button>
+                <button role="menuitemradio" aria-checked="false" data-theme="light" class="block w-full text-left px-3 py-2 text-slate-800 hover:bg-blue-100/60 focus:outline-none focus:ring dark:text-gray-100 dark:hover:bg-gray-900">Light</button>
               </div>
             </div>
         </nav>

@@ -59,7 +59,7 @@ $pageTitle = 'View IPTV';
     </script>
     <div class="min-h-screen flex flex-col">
     <div>
-    <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
+    <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 border border-sky-200 bg-gradient-to-br from-white via-sky-50 to-blue-100 p-2 rounded shadow space-y-2 dark:border-gray-500 dark:bg-gray-950">
         <a href="#playerHeading" class="block">Skip to player</a>
         <a href="#playlistControlsHeading" class="block">Skip to playlist controls</a>
         <a href="#streamGridHeading" class="block">Skip to streams</a>
@@ -87,9 +87,9 @@ $pageTitle = 'View IPTV';
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                     <label for="manifestUrl" class="sr-only">Playlist URL</label>
                     <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
-                        class="flex-1 min-w-0 px-3 py-2 border border-sky-200 rounded shadow-sm bg-white focus:outline-none focus:ring focus:ring-sky-200 dark:bg-gray-950 dark:text-gray-100 dark:border-gray-500" />
+                        class="flex-1 min-w-0 px-3 py-2 border border-sky-200 rounded shadow-sm bg-gradient-to-br from-white via-sky-50 to-blue-100 focus:outline-none focus:ring focus:ring-sky-200 dark:bg-gray-950 dark:text-gray-100 dark:border-gray-500" />
                     <datalist id="history"></datalist>
-                    <button id="loadBtn" class="px-4 py-2 bg-white text-gray-800 border border-slate-300 rounded shadow hover:bg-slate-100 focus:outline-none focus:ring focus:ring-slate-300 dark:bg-black dark:text-gray-100 dark:border dark:border-gray-500 dark:hover:bg-gray-900">
+                    <button id="loadBtn" class="px-4 py-2 bg-gradient-to-r from-white via-sky-50 to-blue-100 text-slate-800 border border-sky-200 rounded shadow hover:from-sky-50 hover:to-blue-200 focus:outline-none focus:ring focus:ring-sky-300 dark:bg-black dark:text-gray-100 dark:border dark:border-gray-500 dark:hover:bg-gray-900">
                         Load
                     </button>
                     <div class="relative z-10 flex items-center justify-center">
@@ -100,7 +100,7 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">History</span>
                         </button>
-                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full z-20 mt-2 w-64 max-w-[80vw] overflow-hidden rounded border border-sky-200 bg-white shadow hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:border-gray-500 dark:bg-gray-950"></div>
+                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full z-20 mt-2 w-64 max-w-[80vw] overflow-hidden rounded border border-sky-200 bg-gradient-to-b from-white via-sky-50 to-blue-100 shadow hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:border-gray-500 dark:bg-gray-950"></div>
                     </div>
                     <div class="relative z-10 flex items-center justify-center">
                         <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-slate-700 hover:text-slate-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
@@ -111,7 +111,7 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">Share</span>
                         </button>
-                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full z-20 mt-2 w-56 max-w-[80vw] overflow-hidden rounded border border-sky-200 bg-white shadow hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:border-gray-500 dark:bg-gray-950">
+                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full z-20 mt-2 w-56 max-w-[80vw] overflow-hidden rounded border border-sky-200 bg-gradient-to-b from-white via-sky-50 to-blue-100 shadow hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:border-gray-500 dark:bg-gray-950">
                             <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist</button>
                             <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist &amp; video</button>
                         </div>
@@ -137,7 +137,7 @@ $pageTitle = 'View IPTV';
                 <div id="searchWrap" class="hidden w-full" hidden>
                     <label for="searchInput" class="sr-only">Filter channels</label>
                     <input id="searchInput" type="text" placeholder="Filter channels..."
-                        class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
+                        class="w-full px-3 py-2 border border-sky-200 rounded shadow-sm bg-gradient-to-r from-white via-sky-50 to-blue-100 focus:outline-none focus:ring focus:ring-sky-200 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
                 </div>
 
                 <div id="listWrapper" class="mt-6 pb-4">
