@@ -691,6 +691,23 @@ function renderList(items) {
 
         streamList.appendChild(btn);
     });
+
+    const bottomSpacerBtn = document.createElement("button");
+    bottomSpacerBtn.type = "button";
+    bottomSpacerBtn.disabled = true;
+    bottomSpacerBtn.tabIndex = -1;
+    bottomSpacerBtn.setAttribute("aria-hidden", "true");
+    bottomSpacerBtn.className = [
+      'w-full',
+      'h-24',
+      'rounded',
+      'border',
+      'border-transparent',
+      'bg-transparent',
+      'opacity-0',
+      'pointer-events-none',
+    ].join(' ');
+    streamList.appendChild(bottomSpacerBtn);
 }
 
 function showPlaceholder() {
