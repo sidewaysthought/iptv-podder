@@ -1,4 +1,15 @@
 <?php
+$https_on_for_cookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['SERVER_PORT'] ?? 0) == 443)
+    || (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $https_on_for_cookie,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 session_start();
 
 // Authentication
@@ -221,12 +232,20 @@ curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($ch, $header) use (&$contentTy
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => false,
     CURLOPT_USERAGENT => 'IPTV-Proxy',
-    // Allow redirects (some providers return 302 on manifests/segments). Primary IP check still prevents private-net SSRF.
+    // Allow redirects (providers often return 302 for manifests/segments).
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_MAXREDIRS => 3,
     CURLOPT_CONNECTTIMEOUT => 10,
     CURLOPT_TIMEOUT => 30,
 ]);
+
+if (defined('CURLOPT_PROTOCOLS')) {
+    curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+}
+if (defined('CURLOPT_REDIR_PROTOCOLS')) {
+    curl_setopt($ch, CURLOPT_REDIR_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
+}
+
 
 $sentHeaders = false;
 $total = 0;
