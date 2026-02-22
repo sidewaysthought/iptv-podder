@@ -85,6 +85,15 @@ $pageTitle = 'View IPTV';
                         </div>
                     </div>
                 </div>
+                <div class="max-w-5xl mx-auto mt-3 border-t text-xs text-gray-800 pt-3 dark:text-gray-100" aria-label="Stream status legend">
+                    <p class="font-semibold">Status legend</p>
+                    <ul class="mt-1 flex items-center gap-4 whitespace-nowrap overflow-x-auto" role="list">
+                        <li class="inline-flex items-center gap-1"><span aria-hidden="true">⏳</span> Loading (trying to play)</li>
+                        <li class="inline-flex items-center gap-1"><span aria-hidden="true">▶</span> Playing now</li>
+                        <li class="inline-flex items-center gap-1"><span aria-hidden="true">✓</span> Works (played before)</li>
+                        <li class="inline-flex items-center gap-1"><span aria-hidden="true">✕</span> Failed to play</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -101,16 +110,6 @@ $pageTitle = 'View IPTV';
 
                 <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto">
                     <div id="streamList" class="grid gap-3 w-full mx-auto" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 220px)); justify-content: center; gap: 0.75rem; max-width: calc((220px * 6) + (0.75rem * 5));"></div>
-                </div>
-
-                <div class="mt-3 border-t text-xs text-gray-800 pt-3 dark:text-gray-100" aria-label="Stream status legend">
-                    <p class="font-semibold">Status legend</p>
-                    <ul class="mt-1 space-y-1">
-                        <li><span aria-hidden="true">⏳</span> <span class="sr-only">Loading</span> Loading (trying to play)</li>
-                        <li><span aria-hidden="true">▶</span> <span class="sr-only">Playing</span> Playing now</li>
-                        <li><span aria-hidden="true">✓</span> <span class="sr-only">Works</span> Works (played before)</li>
-                        <li><span aria-hidden="true">✕</span> <span class="sr-only">Failed</span> Failed to play</li>
-                    </ul>
                 </div>
             </div>
         </section>
