@@ -21,13 +21,12 @@ $pageTitle = 'View IPTV';
     <style>
         :root {
             --site-header-height: 4.5rem;
-            --site-player-height: clamp(13rem, 49vw, 32rem);
+            --site-player-height: clamp(10rem, 45vw, 28rem);
             --site-footer-height: 5rem;
         }
 
         #fixedPlayerRow {
             top: var(--site-header-height);
-            min-height: var(--site-player-height);
         }
 
         #appMain {
@@ -76,7 +75,7 @@ $pageTitle = 'View IPTV';
                     <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring dark:bg-black dark:text-gray-100 dark:border dark:border-gray-500 dark:hover:bg-gray-900">
                         Load
                     </button>
-                    <div class="relative flex items-center z-50 justify-center">
+                    <div class="relative flex items-center justify-center">
                         <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                                 <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
@@ -84,9 +83,9 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">History</span>
                         </button>
-                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"></div>
+                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-20 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"></div>
                     </div>
-                    <div class="relative flex items-center z-50 justify-center">
+                    <div class="relative flex items-center justify-center">
                         <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                                 <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
@@ -95,7 +94,7 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">Share</span>
                         </button>
-                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500">
+                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-20 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500">
                             <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist</button>
                             <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist &amp; video</button>
                         </div>
