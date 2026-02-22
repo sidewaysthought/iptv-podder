@@ -21,13 +21,12 @@ $pageTitle = 'View IPTV';
     <style>
         :root {
             --site-header-height: 4.5rem;
-            --site-player-height: clamp(13rem, 49vw, 32rem);
+            --site-player-height: clamp(10rem, 45vw, 28rem);
             --site-footer-height: 5rem;
         }
 
         #fixedPlayerRow {
             top: var(--site-header-height);
-            min-height: var(--site-player-height);
         }
 
         #appMain {
