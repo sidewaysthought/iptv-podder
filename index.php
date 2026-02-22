@@ -27,51 +27,57 @@ $pageTitle = 'View IPTV';
 
         <!-- Player (top) -->
         <section class="w-full">
-            <div id="playerWrapper" class="relative w-full" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
-                <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
+            <div class="max-w-5xl mx-auto">
+                <div id="playerWrapper" class="relative w-full" style="padding-top: 45%;"> <!-- slightly shorter than 16:9 -->
+                    <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
+                </div>
             </div>
         </section>
 
         <!-- Scrollable panel (bottom) -->
         <section id="playlistPanel" class="mt-4 flex-1 min-h-0 border border-gray-300 rounded shadow-sm overflow-hidden bg-white dark:bg-gray-900 dark:border-gray-700">
-            <!-- URL bar + actions -->
-            <div class="p-3 border-b border-gray-200 dark:border-gray-700">
-                <div id="playlistForm" tabindex="-1" class="flex flex-col sm:flex-row gap-2">
-                    <label for="manifestUrl" class="sr-only">Playlist URL</label>
-                    <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
-                        class="flex-1 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
-                    <datalist id="history"></datalist>
-                    <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
-                        Load
-                    </button>
-                    <div class="relative flex items-center z-50">
-                        <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
-                                <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span class="sr-only">History</span>
+            <!-- URL bar + actions (centered row w/ gentle gradient) -->
+            <div class="border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+                <div class="p-3">
+                    <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-center">
+                        <label for="manifestUrl" class="sr-only">Playlist URL</label>
+                        <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
+                            class="flex-1 min-w-0 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
+                        <datalist id="history"></datalist>
+                        <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
+                            Load
                         </button>
-                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"></div>
-                    </div>
-                    <div class="relative flex items-center z-50">
-                        <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
-                                <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
-                                <rect x="5" y="14" width="14" height="6" rx="1" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <span class="sr-only">Share</span>
-                        </button>
-                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700">
-                            <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist</button>
-                            <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist &amp; video</button>
+                        <div class="relative flex items-center z-50 justify-center">
+                            <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
+                                    <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M12 7v5l3 3" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span class="sr-only">History</span>
+                            </button>
+                            <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"></div>
+                        </div>
+                        <div class="relative flex items-center z-50 justify-center">
+                            <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
+                                    <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M9 8l3-3 3 3" stroke-linecap="round" stroke-linejoin="round" />
+                                    <rect x="5" y="14" width="14" height="6" rx="1" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span class="sr-only">Share</span>
+                            </button>
+                            <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700">
+                                <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist</button>
+                                <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist &amp; video</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Search -->
-                <div id="searchWrap" class="hidden mt-3">
+            <!-- Filter + channels further down -->
+            <div class="p-3">
+                <div id="searchWrap" class="hidden max-w-5xl mx-auto">
                     <label for="searchInput" class="sr-only">Filter channels</label>
                     <input id="searchInput" type="text" placeholder="Filter channels..."
                         class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
@@ -80,7 +86,7 @@ $pageTitle = 'View IPTV';
 
             <!-- Streams grid (scrollable) -->
             <div id="listWrapper" class="flex-1 min-h-0 overflow-y-auto">
-                <div id="streamList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-3"></div>
+                <div id="streamList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-3 pt-0 max-w-5xl mx-auto"></div>
             </div>
 
             <div class="border-t text-xs text-gray-800 p-3 dark:text-gray-100" aria-label="Stream status legend">
