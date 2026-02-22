@@ -53,7 +53,7 @@ $pageTitle = 'View IPTV';
 
         <!-- Row: player -->
         <section id="fixedPlayerRow" class="fixed inset-x-0 z-40 w-full bg-gradient-to-br from-white via-sky-50 to-blue-100 dark:bg-black">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
                 <h2 id="playerHeading" class="sr-only">Video player</h2>
                 <div class="max-w-5xl mx-auto">
                     <div id="playerWrapper" class="relative w-full" style="padding-top: 45%;">
@@ -64,7 +64,7 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: controls bar (full width stripe, inset controls) -->
-        <section class="relative z-10 w-full border-y border-sky-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),inset_0_-1px_0_rgba(148,163,184,0.35)] dark:border-gray-500 bg-gradient-to-r from-sky-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <section class="w-full border-y border-sky-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.85),inset_0_-1px_0_rgba(148,163,184,0.35)] dark:border-gray-500 bg-gradient-to-r from-sky-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
                 <h2 id="playlistControlsHeading" class="sr-only">Playlist controls</h2>
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
@@ -75,7 +75,7 @@ $pageTitle = 'View IPTV';
                     <button id="loadBtn" class="px-4 py-2 bg-white text-gray-800 border border-slate-300 rounded shadow hover:bg-slate-100 focus:outline-none focus:ring focus:ring-slate-300 dark:bg-black dark:text-gray-100 dark:border dark:border-gray-500 dark:hover:bg-gray-900">
                         Load
                     </button>
-                    <div class="relative flex items-center justify-center">
+                    <div class="relative flex items-center z-50 justify-center">
                         <button id="historyBtn" aria-haspopup="menu" aria-controls="historyMenu" aria-expanded="false" class="px-2 text-slate-700 hover:text-slate-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                                 <path d="M3 12a9 9 0 1118 0 9 9 0 01-18 0z" stroke-linecap="round" stroke-linejoin="round" />
@@ -83,9 +83,9 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">History</span>
                         </button>
-                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border border-sky-200 rounded shadow hidden z-20 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"></div>
+                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border border-sky-200 rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"></div>
                     </div>
-                    <div class="relative flex items-center justify-center">
+                    <div class="relative flex items-center z-50 justify-center">
                         <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-slate-700 hover:text-slate-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-5 h-5" stroke-width="2">
                                 <path d="M12 5v12" stroke-linecap="round" stroke-linejoin="round" />
@@ -94,7 +94,7 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">Share</span>
                         </button>
-                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border border-sky-200 rounded shadow hidden z-20 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500">
+                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border border-sky-200 rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500">
                             <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist</button>
                             <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 text-slate-800 hover:bg-sky-50 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist &amp; video</button>
                         </div>
