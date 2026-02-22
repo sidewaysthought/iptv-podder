@@ -620,7 +620,10 @@ function renderList(items) {
           'border',
           'border-gray-200',
           'bg-white',
-          'p-3',
+          // even sizing
+          'h-16',
+          'px-3',
+          'py-2',
           'shadow-sm',
           'hover:bg-gray-50',
           'focus:outline-none',
@@ -631,10 +634,10 @@ function renderList(items) {
         ].join(' ');
 
         const row = document.createElement('div');
-        row.className = 'flex items-start justify-between gap-2';
+        row.className = 'h-full flex items-center justify-between gap-2';
 
         const nameSpan = document.createElement("span");
-        nameSpan.className = 'font-medium text-blue-700 dark:text-blue-300 break-words';
+        nameSpan.className = 'font-medium text-blue-700 dark:text-blue-300 break-words overflow-hidden';
         nameSpan.textContent = item.label || `Stream ${idx + 1}`;
 
         const icons = document.createElement('span');
