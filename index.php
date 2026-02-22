@@ -10,28 +10,18 @@ $pageTitle = 'View IPTV';
     <div class="min-h-screen flex flex-col">
     <div>
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
-        <a href="#playlistForm" class="block">Skip to playlist</a>
-        <a href="#videoPlayer" class="block">Skip to video player</a>
+        <a href="#playerHeading" class="block">Skip to player</a>
+        <a href="#playlistControlsHeading" class="block">Skip to playlist controls</a>
+        <a href="#streamGridHeading" class="block">Skip to streams</a>
     </nav>
     <?php include 'partials/header.php'; ?>
     </div>
     <main class="w-full flex-1 min-h-0 flex flex-col">
-        <!-- Row: page intro -->
-        <section class="w-full">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-                <header>
-                    <h1 class="text-3xl font-bold">IPTV Stream Viewer</h1>
-                    <p class="mt-1 text-gray-600 dark:text-gray-300">
-                        Paste an <code>.m3u</code> or <code>.m3u8</code> playlist/manifest URL. We’ll list the
-                        streams and play them on click.
-                    </p>
-                </header>
-            </div>
-        </section>
 
         <!-- Row: player -->
         <section class="w-full">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
+                <h2 id="playerHeading" class="sr-only">Video player</h2>
                 <div class="max-w-5xl mx-auto">
                     <div id="playerWrapper" class="relative w-full" style="padding-top: 45%;">
                         <video id="videoPlayer" class="absolute top-0 left-0 w-full h-full rounded shadow-lg bg-black" controls preload="metadata"></video>
@@ -43,6 +33,7 @@ $pageTitle = 'View IPTV';
         <!-- Row: controls bar (full width stripe, inset controls) -->
         <section class="w-full border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+                <h2 id="playlistControlsHeading" class="sr-only">Playlist controls</h2>
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                     <label for="manifestUrl" class="sr-only">Playlist URL</label>
                     <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
@@ -82,6 +73,7 @@ $pageTitle = 'View IPTV';
         <!-- Row: playlist browsing (search + scrollable channel grid) -->
         <section id="playlistPanel" class="w-full flex-1 min-h-0">
             <div class="w-full px-4 sm:px-6 py-4 flex flex-col min-h-0">
+                <h2 id="streamGridHeading" class="sr-only">Stream list</h2>
                 <!-- Filter UI can be re-enabled later; keep DOM element for JS but hide it for now. -->
                 <div id="searchWrap" class="hidden w-full" hidden>
                     <label for="searchInput" class="sr-only">Filter channels</label>
