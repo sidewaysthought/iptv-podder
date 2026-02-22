@@ -17,7 +17,7 @@ $pageTitle = 'View IPTV';
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'partials/head.php'; ?>
-<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-black dark:text-gray-100">
     <style>
         :root {
             --site-header-height: 4.5rem;
@@ -53,7 +53,7 @@ $pageTitle = 'View IPTV';
     <main id="appMain" class="w-full">
 
         <!-- Row: player -->
-        <section id="fixedPlayerRow" class="fixed inset-x-0 z-40 w-full bg-gray-100 dark:bg-gray-950">
+        <section id="fixedPlayerRow" class="fixed inset-x-0 z-40 w-full bg-gray-100 dark:bg-black">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
                 <h2 id="playerHeading" class="sr-only">Video player</h2>
                 <div class="max-w-5xl mx-auto">
@@ -65,15 +65,15 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: controls bar (full width stripe, inset controls) -->
-        <section class="w-full border-y border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+        <section class="w-full border-y border-gray-200 dark:border-gray-500 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4">
                 <h2 id="playlistControlsHeading" class="sr-only">Playlist controls</h2>
                 <div id="playlistForm" tabindex="-1" class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                     <label for="manifestUrl" class="sr-only">Playlist URL</label>
                     <input id="manifestUrl" type="url" list="history" placeholder="https://example.com/playlist.m3u8"
-                        class="flex-1 min-w-0 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700" />
+                        class="flex-1 min-w-0 px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring dark:bg-gray-950 dark:text-gray-100 dark:border-gray-500" />
                     <datalist id="history"></datalist>
-                    <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring">
+                    <button id="loadBtn" class="px-4 py-2 bg-blue-700 text-white rounded shadow hover:bg-blue-800 focus:outline-none focus:ring dark:bg-black dark:text-gray-100 dark:border dark:border-gray-500 dark:hover:bg-gray-900">
                         Load
                     </button>
                     <div class="relative flex items-center z-50 justify-center">
@@ -84,7 +84,7 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">History</span>
                         </button>
-                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700"></div>
+                        <div id="historyMenu" role="menu" aria-labelledby="historyBtn" class="absolute right-0 top-full mt-2 w-64 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500"></div>
                     </div>
                     <div class="relative flex items-center z-50 justify-center">
                         <button id="shareBtn" aria-haspopup="menu" aria-controls="shareMenu" aria-expanded="false" class="px-2 text-blue-700 hover:text-blue-900 focus:outline-none focus:ring rounded dark:text-blue-300 dark:hover:text-blue-200">
@@ -95,9 +95,9 @@ $pageTitle = 'View IPTV';
                             </svg>
                             <span class="sr-only">Share</span>
                         </button>
-                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-900 dark:border-gray-700">
-                            <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist</button>
-                            <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-800 dark:text-gray-100" disabled>Share playlist &amp; video</button>
+                        <div id="shareMenu" role="menu" aria-labelledby="shareBtn" class="absolute right-0 top-full mt-2 w-56 max-w-[80vw] bg-white border rounded shadow hidden z-50 overflow-hidden max-h-[60vh] overflow-y-auto overscroll-contain dark:bg-gray-950 dark:border-gray-500">
+                            <button id="sharePlaylistBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist</button>
+                            <button id="shareVideoBtn" role="menuitem" class="block w-full text-left px-2 py-1 hover:bg-gray-100 focus:outline-none focus:ring disabled:opacity-50 dark:hover:bg-gray-900 dark:text-gray-100" disabled>Share playlist &amp; video</button>
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@ $pageTitle = 'View IPTV';
         </section>
 
         <!-- Row: playlist browsing (search + scrollable channel grid) -->
-        <section id="playlistPanel" class="w-full">
+        <section id="playlistPanel" class="w-full dark:bg-gray-950">
             <div class="w-full px-4 sm:px-6 py-4">
                 <h2 id="streamGridHeading" class="sr-only">Stream list</h2>
                 <!-- Filter UI can be re-enabled later; keep DOM element for JS but hide it for now. -->
