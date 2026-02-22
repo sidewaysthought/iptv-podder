@@ -1,6 +1,6 @@
 <header class="bg-gray-200 dark:bg-gray-900 relative z-50">
     <div class="container mx-auto max-w-6xl flex justify-between items-center p-4">
-        <div class="font-semibold text-gray-900 dark:text-gray-100">View-IPTV.stream</div>
+        <h1 class="m-0 text-lg font-semibold text-gray-900 dark:text-gray-100"><a href="index.php" class="hover:underline focus:underline">View-IPTV.stream</a></h1>
         <nav class="space-x-4 flex items-center">
             <a href="index.php" class="text-blue-700 hover:underline dark:text-blue-300">Home</a>
 
