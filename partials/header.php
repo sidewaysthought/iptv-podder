@@ -1,4 +1,4 @@
-<header class="bg-gray-200 dark:bg-gray-900 relative z-50">
+<header class="fixed inset-x-0 top-0 bg-gray-200 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700 z-50">
     <div class="container mx-auto max-w-6xl flex justify-between items-center p-4">
         <h1 class="m-0 text-lg font-semibold text-gray-900 dark:text-gray-100"><a href="index.php" class="hover:underline focus:underline">View-IPTV.stream</a></h1>
         <nav class="space-x-4 flex items-center">
