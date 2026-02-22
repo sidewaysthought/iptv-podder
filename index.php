@@ -18,6 +18,13 @@ $pageTitle = 'View IPTV';
 <html lang="en">
 <?php include 'partials/head.php'; ?>
 <body class="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    <style>
+        @media (min-width: 640px) {
+            #playerWrapper {
+                padding-top: min(45%, 45vh) !important;
+            }
+        }
+    </style>
     <div class="min-h-screen flex flex-col">
     <div>
     <nav class="sr-only focus-within:not-sr-only absolute left-2 top-2 bg-white p-2 rounded shadow space-y-2">
