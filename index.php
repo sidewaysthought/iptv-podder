@@ -90,7 +90,7 @@ $pageTitle = 'View IPTV';
                 </div>
 
                 <div id="listWrapper" class="mt-6 flex-1 min-h-0 overflow-y-auto">
-                    <div id="streamList" class="grid gap-3 w-full max-w-[1400px] mx-auto" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); justify-items: stretch;"></div>
+                    <div id="streamList" class="grid gap-3 w-full max-w-[1400px] mx-auto" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 220px)); justify-content: start; gap: 0.75rem;"></div>
                 </div>
 
                 <div class="mt-3 border-t text-xs text-gray-800 pt-3 dark:text-gray-100" aria-label="Stream status legend">
